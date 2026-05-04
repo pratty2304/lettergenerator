@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Letter Generator — KIMS MACS</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="generator">
+  <header class="site-header no-print">
+    <a href="index.html" class="back-link">← Back</a>
+    <img src="assets/kims-logo.png" alt="KIMS MACS" class="logo small" />
+    <div class="tagline" id="letterTitle">Letter</div>
+  </header>
+
+  <main class="generator-shell">
+    <aside class="form-panel no-print">
+      <h2 class="panel-title">Letter details</h2>
+      <form id="letterForm" autocomplete="off"></form>
+      <div class="actions">
+        <button type="button" id="generateBtn" class="btn primary">Generate</button>
+        <button type="button" id="printBtn" class="btn ghost">Print / Save PDF</button>
+        <button type="button" id="resetBtn" class="btn ghost">Reset</button>
+      </div>
+      <p class="hint">Tip: After generating, click anywhere on the preview to edit text directly before printing.</p>
+    </aside>
+
+    <section class="preview-panel">
+      <article id="letterPreview" class="letter-page" contenteditable="false">
+        <div class="empty-state">
+          <p>Fill the form and click <strong>Generate</strong> to preview the letter.</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/doctors.js"></script>
+  <script src="js/drugs.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

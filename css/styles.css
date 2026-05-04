@@ -1,0 +1,634 @@
+/* ============================================================
+   KIMS MACS Letter Generator — pastel, minimal, print-friendly
+   ============================================================ */
+
+:root {
+  --c-mint: #d8efe4;
+  --c-peach: #fbe2cf;
+  --c-lavender: #e2dcf3;
+  --c-blush: #f7d9dc;
+  --c-sky: #d6e8f5;
+  --c-rose: #f4cfd6;
+  --c-sage: #dde7d3;
+  --c-cream: #f6ecd4;
+  --c-lilac: #e7d8eb;
+
+  --ink: #1f2a44;
+  --ink-soft: #4a5876;
+  --muted: #8b94a8;
+  --line: #e3e6ee;
+  --bg: #f7f8fb;
+  --card: #ffffff;
+  --accent: #4a6fa5;
+  --accent-soft: #eaf1fb;
+
+  --radius: 14px;
+  --shadow-sm: 0 1px 2px rgba(20, 30, 60, 0.04), 0 4px 12px rgba(20, 30, 60, 0.04);
+  --shadow-md: 0 4px 18px rgba(20, 30, 60, 0.08);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'EB Garamond', 'Georgia', 'Times New Roman', serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- Header ---------- */
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 32px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+.site-header .logo {
+  height: 48px;
+  width: auto;
+}
+.site-header .logo.small { height: 38px; }
+.site-header .tagline {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--ink-soft);
+  letter-spacing: 0.4px;
+}
+.back-link {
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* ---------- Home ---------- */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+.page-title {
+  font-size: 30px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.page-sub {
+  margin: 0 0 36px;
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+.letter-card {
+  display: block;
+  padding: 22px 22px 20px;
+  border-radius: var(--radius);
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+.letter-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+}
+.letter-card .card-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 14px;
+  letter-spacing: 0.5px;
+}
+.letter-card h2 {
+  font-size: 17px; font-weight: 600;
+  margin: 0 0 6px;
+}
+.letter-card p {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.mint   .card-icon { background: var(--c-mint); }
+.peach  .card-icon { background: var(--c-peach); }
+.lavender .card-icon { background: var(--c-lavender); }
+.blush  .card-icon { background: var(--c-blush); }
+.sky    .card-icon { background: var(--c-sky); }
+.rose   .card-icon { background: var(--c-rose); }
+.sage   .card-icon { background: var(--c-sage); }
+.cream  .card-icon { background: var(--c-cream); }
+.lilac  .card-icon { background: var(--c-lilac); }
+
+/* ---------- Footer ---------- */
+.site-footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 13px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+/* ---------- Generator layout ---------- */
+.generator-shell {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 24px;
+  padding: 24px 32px 60px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .generator-shell { grid-template-columns: 1fr; }
+}
+
+.form-panel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  box-shadow: var(--shadow-sm);
+}
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 14px;
+  color: var(--ink);
+}
+
+#letterForm .field {
+  margin-bottom: 13px;
+}
+#letterForm label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+  letter-spacing: 0.2px;
+}
+#letterForm input[type="text"],
+#letterForm input[type="number"],
+#letterForm input[type="date"],
+#letterForm select,
+#letterForm textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fafbfd;
+  transition: border-color 0.15s, background 0.15s;
+}
+#letterForm input:focus,
+#letterForm select:focus,
+#letterForm textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+}
+#letterForm textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+#letterForm .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+#letterForm .field-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin: 18px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 9px 16px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn.primary:hover { background: #3a5d92; }
+.btn.ghost {
+  background: #fff;
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+.btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 14px;
+  line-height: 1.5;
+}
+
+
+/* ---------- Preview / letter page ---------- */
+.preview-panel {
+  display: flex;
+  justify-content: center;
+}
+.letter-page {
+  background: #fff;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 22mm 22mm 24mm;
+  box-shadow: var(--shadow-md);
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  font-size: 13pt;
+  line-height: 1.55;
+  color: #1a1a1a;
+}
+.letter-page[contenteditable="true"] {
+  outline: 2px dashed var(--c-sky);
+  outline-offset: -8px;
+}
+.letter-page .empty-state {
+  display: flex; align-items: center; justify-content: center;
+  height: 60vh;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.letter-page .letter-logo {
+  max-height: 97px;
+  margin-bottom: 16px;
+}
+.letter-page h1.letter-heading {
+  font-family: var(--font-sans);
+  text-align: center;
+  font-size: 16pt;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 18px 0 26px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #2c3e60;
+  color: #1f2a44;
+}
+.letter-page .meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-size: 11pt;
+  color: #4a5876;
+  margin-bottom: 22px;
+}
+.letter-page .salutation { margin: 18px 0 14px; }
+.letter-page p { margin: 0 0 12px; text-align: justify; }
+.letter-page .body p { text-indent: 0; }
+.letter-page ul, .letter-page ol { margin: 8px 0 14px 22px; padding: 0; }
+.letter-page li { margin-bottom: 4px; }
+.letter-page .patient-block {
+  font-family: var(--font-sans);
+  font-size: 11pt;
+  background: #f7f9fc;
+  border-left: 3px solid var(--c-sky);
+  padding: 12px 16px;
+  margin: 10px 0 22px;
+  border-radius: 4px;
+}
+.letter-page .patient-block .pt-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 4px 12px;
+  margin-bottom: 4px;
+}
+.letter-page .patient-block .pt-row span:first-child {
+  font-weight: 600; color: #4a5876;
+}
+.letter-page .signoff {
+  margin-top: 38px;
+}
+.letter-page .signoff .sig-space { height: 50px; }
+.letter-page .signoff .doctor-name {
+  font-weight: 700;
+  font-family: var(--font-sans);
+  font-size: 12pt;
+  margin-top: 4px;
+}
+.letter-page .signoff .doctor-meta {
+  font-family: var(--font-sans);
+  font-size: 10.5pt;
+  color: #4a5876;
+  line-height: 1.45;
+}
+.letter-page .rx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 11pt;
+  margin: 10px 0 16px;
+}
+.letter-page .rx-table th, .letter-page .rx-table td {
+  border: 1px solid #c9cfdc;
+  padding: 8px 10px;
+  text-align: left;
+}
+.letter-page .rx-table th {
+  background: #eef3fa;
+  font-weight: 600;
+  color: #2c3e60;
+}
+.letter-page .rx-symbol {
+  font-family: var(--font-serif);
+  font-size: 26pt;
+  font-weight: 700;
+  color: #2c3e60;
+  margin: 0 0 4px;
+}
+
+/* ---------- Prescription-specific layout (matches PAP submission look) ---------- */
+.letter-page .rx-date-line {
+  font-family: var(--font-sans);
+  font-size: 12pt;
+  text-align: right;
+  margin: 4px 0 26px;
+}
+.letter-page h1.rx-title {
+  font-family: var(--font-sans);
+  font-size: 14pt;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: underline;
+  margin: 0 0 22px;
+  border: none;
+  padding: 0;
+  text-transform: none;
+  letter-spacing: 0;
+  color: #1a1a1a;
+}
+.letter-page .rx-patient {
+  font-family: var(--font-sans);
+  font-size: 12pt;
+  margin: 6px 0 8px;
+}
+.letter-page .rx-patient .rx-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 4px 16px;
+  margin-bottom: 4px;
+}
+.letter-page .rx-patient .rx-row span:first-child { font-weight: 700; }
+.letter-page .rx-divider {
+  border: none;
+  border-top: 1px solid #1a1a1a;
+  margin: 18px 0 18px;
+}
+.letter-page .rx-summary {
+  font-family: var(--font-sans);
+  font-size: 12pt;
+  line-height: 1.7;
+  text-align: left;
+  margin: 0 0 22px;
+}
+.letter-page .rx-big {
+  font-family: var(--font-sans);
+  font-size: 26pt;
+  font-weight: 700;
+  margin: 18px 0 10px;
+}
+.letter-page .rx-drug-line {
+  font-family: var(--font-sans);
+  font-size: 14pt;
+  font-weight: 700;
+  text-align: center;
+  margin: 14px 0 4px;
+}
+.letter-page .rx-vial-line {
+  font-family: var(--font-sans);
+  font-size: 12pt;
+  text-align: center;
+  margin: 0 0 10px;
+}
+.letter-page .rx-spacer { height: 80px; }
+.letter-page .rx-signoff {
+  font-family: var(--font-sans);
+  margin-top: 30px;
+}
+.letter-page .rx-signoff .rx-sig-line {
+  border-top: 1px solid #1a1a1a;
+  width: 220px;
+  margin-bottom: 6px;
+}
+.letter-page .rx-signoff .doctor-name { font-weight: 700; font-size: 12pt; }
+.letter-page .rx-signoff .doctor-meta { font-size: 10.5pt; line-height: 1.5; color: #1a1a1a; }
+
+/* ---------- Continuing-care section headings ---------- */
+.letter-page h3.cc-section {
+  font-family: var(--font-sans);
+  font-size: 11.5pt;
+  font-weight: 700;
+  color: #2c3e60;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 18px 0 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #c9cfdc;
+}
+.letter-page .cc-body {
+  font-family: var(--font-sans);
+  font-size: 11pt;
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+.letter-page .cc-body p { text-align: left; margin: 0 0 4px; }
+
+.letter-page .cc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 10.5pt;
+  margin: 4px 0 8px;
+}
+.letter-page .cc-table th,
+.letter-page .cc-table td {
+  border: 1px solid #c9cfdc;
+  padding: 6px 9px;
+  text-align: left;
+  vertical-align: top;
+}
+.letter-page .cc-table th {
+  background: #eef3fa;
+  font-weight: 600;
+  color: #2c3e60;
+}
+
+/* ---------- Form group card heading (in side panel) ---------- */
+.form-group-card-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.3px;
+  margin: 18px 0 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #eef3fb, #f5eef9);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+}
+
+/* ---------- Select with days input ---------- */
+.select-days {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.select-days select { flex: 1; }
+.select-days input[type="number"] {
+  width: 70px !important;
+  text-align: center;
+}
+
+/* ---------- Drug list dynamic rows ---------- */
+.drug-list-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+.drug-list-row {
+  background: #fafbfd;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 28px;
+  grid-template-areas:
+    "drug drug drug remove"
+    "dose solvent volume duration"
+    "note note note note";
+  gap: 6px;
+  align-items: center;
+}
+.drug-list-row .dl-drug      { grid-area: drug; }
+.drug-list-row .dl-dose      { grid-area: dose; }
+.drug-list-row .dl-solvent   { grid-area: solvent; }
+.drug-list-row .dl-volume    { grid-area: volume; }
+.drug-list-row .dl-duration  { grid-area: duration; }
+.drug-list-row .dl-note      { grid-area: note; }
+.drug-list-row .dl-remove    { grid-area: remove; }
+.drug-list-row input,
+.drug-list-row select {
+  width: 100%;
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  font-family: inherit;
+}
+.drug-list-row .dl-drug { font-weight: 500; }
+.drug-list-row .dl-remove {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  width: 28px; height: 28px;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1;
+  padding: 0;
+  align-self: start;
+}
+.drug-list-row .dl-remove:hover { color: #c44; border-color: #c44; }
+.btn-add-drug {
+  font-size: 12.5px;
+  padding: 7px 14px;
+}
+
+/* ---------- Print ---------- */
+@media print {
+  @page { size: A4; margin: 0; }
+  body { background: #fff; }
+  .no-print, .site-header, .site-footer, .form-panel, .actions { display: none !important; }
+  .generator-shell { display: block; padding: 0; }
+  .preview-panel { display: block; }
+  .letter-page {
+    box-shadow: none;
+    border-radius: 0;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0;
+    padding: 18mm 20mm 20mm;
+  }
+  /* Suppress logo/heading for hospital letterhead printing */
+  .letter-page.on-letterhead .letter-logo,
+  .letter-page.on-letterhead .letter-heading-no-print { display: none; }
+}
+
+/* ---------- Black & white printing ---------- */
+@media print and (monochrome) {
+  /* Force greyscale + remove any colour backgrounds globally */
+  .letter-page,
+  .letter-page * {
+    color: #000 !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: economy !important;
+    print-color-adjust: economy !important;
+  }
+  /* Re-establish structural lines in pure black */
+  .letter-page h1.letter-heading        { border-bottom: 2px solid #000 !important; color: #000 !important; }
+  .letter-page .meta-row,
+  .letter-page .signoff .doctor-meta,
+  .letter-page .patient-block,
+  .letter-page .cc-body,
+  .letter-page .rx-summary,
+  .letter-page .rx-signoff .doctor-meta { color: #000 !important; }
+  .letter-page .patient-block           { border-left: 2px solid #000 !important; }
+  .letter-page h3.cc-section            { color: #000 !important; border-bottom: 1px solid #000 !important; }
+  .letter-page .cc-table,
+  .letter-page .rx-table                { border-collapse: collapse !important; }
+  .letter-page .cc-table th,
+  .letter-page .cc-table td,
+  .letter-page .rx-table th,
+  .letter-page .rx-table td             { border: 1px solid #000 !important; color: #000 !important; }
+  .letter-page .cc-table th,
+  .letter-page .rx-table th             { font-weight: 700 !important; border-bottom: 2px solid #000 !important; }
+  .letter-page .rx-symbol,
+  .letter-page .rx-big                  { color: #000 !important; }
+  .letter-page h1.rx-title              { color: #000 !important; text-decoration: underline !important; }
+  .letter-page .rx-divider              { border-top: 1px solid #000 !important; }
+  .letter-page .rx-signoff .rx-sig-line { border-top: 1px solid #000 !important; }
+  /* Convert the KIMS logo to greyscale */
+  .letter-page .letter-logo             { filter: grayscale(100%) !important; }
+}
