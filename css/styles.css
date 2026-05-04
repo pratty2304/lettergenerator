@@ -532,11 +532,12 @@ a:hover { text-decoration: underline; }
   border-radius: 9px;
   padding: 8px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 28px;
+  grid-template-columns: 1fr 1fr 28px;
   grid-template-areas:
-    "drug drug drug remove"
-    "dose solvent volume duration"
-    "note note note note";
+    "drug    drug    remove"
+    "dose    solvent ."
+    "volume  duration ."
+    "note    note    .";
   gap: 6px;
   align-items: center;
 }
