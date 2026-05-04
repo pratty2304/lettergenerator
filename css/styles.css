@@ -581,22 +581,23 @@ a:hover { text-decoration: underline; }
    MOBILE / TABLET (≤ 700px) — desktop layout untouched above
    ============================================================ */
 @media (max-width: 700px) {
-  /* Header */
+  /* Header — keep logo and tagline on the same line */
   .site-header {
-    padding: 12px 14px;
+    padding: 10px 14px;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
   }
-  .site-header .logo { height: 54px; }
-  .site-header .logo.small { height: 44px; }
+  .site-header .logo { height: 60px !important; }
+  .site-header .logo.small { height: 50px !important; }
   .site-header .tagline {
-    font-size: 12.5px;
-    width: 100%;
-    margin-left: 0;
+    font-size: 13px;
+    margin-left: auto;
     text-align: right;
-    order: 3;
+    width: auto;
+    order: 0;
   }
-  .back-link { font-size: 13px; }
+  .back-link { font-size: 13px; flex-shrink: 0; }
 
   /* Home page */
   .container { padding: 24px 16px 60px; }
@@ -718,26 +719,40 @@ a:hover { text-decoration: underline; }
     margin: 14px 0 6px;
   }
 
-  /* Date inputs — iOS Safari renders these inconsistently; force left-aligned, full-width display */
+  /* Date inputs — iOS Safari renders these inconsistently; force a clean, button-like look */
   #letterForm input[type="date"] {
-    -webkit-appearance: none;
-    appearance: none;
-    text-align: left;
-    font-size: 14.5px;
-    padding: 11px 12px;
-    min-height: 42px;
-    background-color: #fafbfd;
-    color: var(--ink);
-    display: block;
-    line-height: 1.2;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 100% !important;
+    display: block !important;
+    text-align: left !important;
+    font-size: 15px !important;
+    font-family: inherit !important;
+    padding: 12px 14px !important;
+    min-height: 46px !important;
+    line-height: 1.2 !important;
+    background-color: #fafbfd !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 9px !important;
+    box-sizing: border-box !important;
   }
   #letterForm input[type="date"]::-webkit-date-and-time-value {
-    text-align: left;
-    min-height: 1.4em;
+    text-align: left !important;
+    min-height: 1.5em !important;
+    font-size: 15px !important;
+    color: var(--ink) !important;
   }
   #letterForm input[type="date"]::-webkit-calendar-picker-indicator {
     margin-left: auto;
-    opacity: 0.6;
+    opacity: 0.7;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+  }
+  #letterForm input[type="date"]::-webkit-datetime-edit {
+    padding: 0;
+    color: var(--ink);
   }
 
   /* Native selects — ensure consistent height & arrow on iOS */
