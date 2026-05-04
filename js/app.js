@@ -228,7 +228,7 @@
         <option>NS or D5W</option>
         <option>LR</option>
       </select>
-      <input class="dl-volume" placeholder="Volume (e.g. 250 mL)" />
+      <input class="dl-volume" placeholder="Volume in mL (e.g. 250)" inputmode="decimal" />
       <input class="dl-duration" placeholder="Duration (e.g. 30 min)" />
       <input class="dl-note" placeholder="Note (e.g. 0.2µm in-line filter)" />
       <button type="button" class="dl-remove" title="Remove">×</button>`;

@@ -666,6 +666,12 @@
 
       // ---- Drug infusion sequence table ----
       const infRows = Array.isArray(d.infusionDrugs) ? d.infusionDrugs : [];
+      const fmtVolume = (v) => {
+        if (!v) return '—';
+        const t = String(v).trim();
+        if (/^\d+(\.\d+)?$/.test(t)) return t + ' mL';
+        return esc(t);
+      };
       const infTable = infRows.length ? `
         <table class="cc-table">
           <thead><tr><th style="width:32px;">#</th><th>Drug</th><th>Dose</th><th>Solvent</th><th>Volume</th><th>Duration</th></tr></thead>
@@ -674,7 +680,7 @@
             <td><strong>${esc(r.drug)}</strong>${r.note ? `<br/><span style="font-size:9.5pt; color:#4a5876; font-style:italic;">${esc(r.note)}</span>` : ''}</td>
             <td>${esc(r.dose) || '—'}</td>
             <td>${esc(r.solvent) || '—'}</td>
-            <td>${esc(r.volume) || '—'}</td>
+            <td>${fmtVolume(r.volume)}</td>
             <td>${esc(r.duration) || '—'}</td>
           </tr>`).join('')}</tbody>
         </table>` : '<p>To be determined per cycle.</p>';
