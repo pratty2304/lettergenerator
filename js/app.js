@@ -349,7 +349,6 @@
 
   function makeDraftData(data) {
     const draft = { ...data };
-    hydrateDraftDrugFields(draft);
     (tmpl.fields || []).forEach(f => {
       const current = draft[f.name];
       if (Array.isArray(current)) return;
@@ -360,24 +359,9 @@
     return draft;
   }
 
-  function hydrateDraftDrugFields(draft) {
-    const hasField = (name) => (tmpl.fields || []).some(f => f.name === name);
-    if (!hasField('drugId')) return;
-    const drugs = window.DRUGS || [];
-    const drug = drugs.find(d => d.id === draft.drugId) || drugs[0];
-    if (!drug) return;
-    if (!draft.drugId) draft.drugId = drug.id;
-    if (hasField('brand') && !draft.brand) draft.brand = drug.brands[0];
-    if (hasField('dose') && !draft.dose) draft.dose = drug.defaultDose;
-  }
-
   function placeholderFor(field) {
     if (field.name === 'sex') return '';
     if (field.name === 'age') return '__';
-    if (field.type === 'select' && field.options && field.options.length) {
-      const first = field.options[0];
-      return typeof first === 'string' ? first : first.value;
-    }
     return `[${field.label.replace(/\s*\*$/, '')}]`;
   }
 

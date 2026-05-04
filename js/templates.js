@@ -284,23 +284,23 @@
     ],
     render(d, doc) {
       const drug = (window.DRUGS || []).find(x => x.id === d.drugId);
-      if (!drug) return '<p>Please select a drug.</p>';
-      const brand = d.brand || drug.brands[0];
-      const dose = d.dose || drug.defaultDose;
+      const generic = drug ? drug.generic : (d.drugId || '[Drug]');
+      const brand = drug ? (d.brand || drug.brands[0]) : (d.brand || '[Brand]');
+      const dose = drug ? (d.dose || drug.defaultDose) : (d.dose || '[Dose & schedule]');
       const doseMg = extractMg(dose);
-      const vialBreak = doseMg ? splitIntoVials(doseMg, drug.vialSizes || [100]) : '';
+      const vialBreak = doseMg && drug ? splitIntoVials(doseMg, drug.vialSizes || [100]) : '';
 
       const title = d.sex === 'Female' ? 'Ms.' : (d.sex === 'Male' ? 'Mr.' : '');
       const sexWord = d.sex === 'Female' ? 'female' : (d.sex === 'Male' ? 'male' : 'patient');
       const fullName = (title ? title + ' ' : '') + (d.patientName || '');
-      const isPembro = drug.id === 'pembrolizumab';
+      const isPembro = drug && drug.id === 'pembrolizumab';
       const cyclesLabel = (isPembro && d.cyclesPlanned)
         ? `This prescription valid for ${esc(d.cyclesPlanned)} cycle${Number(d.cyclesPlanned) === 1 ? '' : 's'}`
         : '';
 
       const regimenText = d.regimen
-        ? `${esc(d.regimen)} + ${esc(drug.generic)}`
-        : `${esc(drug.generic)}`;
+        ? `${esc(d.regimen)} + ${esc(generic)}`
+        : `${esc(generic)}`;
 
       const fmtDate = formatDate(d.letterDate);
 
@@ -326,7 +326,7 @@
 
         <div class="rx-big">Rx</div>
 
-        <div class="rx-drug-line">Inj. ${esc(drug.generic.toUpperCase())} ( ${esc(brand)} ) ${doseMg ? doseMg + ' mg' : esc(dose)}</div>
+        <div class="rx-drug-line">Inj. ${esc(generic.toUpperCase())} ( ${esc(brand)} ) ${doseMg ? doseMg + ' mg' : esc(dose)}</div>
         ${vialBreak ? `<div class="rx-vial-line">( ${vialBreak} )</div>` : ''}
 
         <div class="rx-spacer"></div>
