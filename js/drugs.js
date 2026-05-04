@@ -1,5 +1,5 @@
-// Immunotherapy drugs available for prescription generation
-// Each drug includes brand options used for PAP submissions in India.
+// Oncology drugs available for prescription generation.
+// Each drug includes brand options used for PAP / treatment prescriptions in India.
 window.DRUGS = [
   {
     id: 'pembrolizumab',
@@ -32,10 +32,11 @@ window.DRUGS = [
     class: 'Anti–PD-1 monoclonal antibody',
     vialSizes: [240, 100, 40],
     standardDoses: [
+      '40 mg IV every 2 weeks',
       '240 mg IV every 2 weeks',
+      '360 mg IV every 3 weeks',
       '480 mg IV every 4 weeks',
-      '3 mg/kg IV every 2 weeks (weight-based)',
-      '360 mg IV every 3 weeks (in combination regimens)'
+      '3 mg/kg IV every 2 weeks (weight-based)'
     ],
     defaultDose: '240 mg IV every 2 weeks',
     infusionTime: 'over 30 minutes',
@@ -76,6 +77,29 @@ window.DRUGS = [
     monitoring: 'Baseline and pre-cycle CBC, LFT, RFT, TFT, cortisol; pulmonary review for pneumonitis especially in post-radiation setting. Standard irAE surveillance.'
   },
   {
+    id: 'atezolizumab',
+    generic: 'Atezolizumab',
+    brands: ['Tecentriq'],
+    class: 'Anti–PD-L1 monoclonal antibody',
+    vialSizes: [1200, 840],
+    standardDoses: [
+      '840 mg IV every 2 weeks',
+      '1200 mg IV every 3 weeks',
+      '1680 mg IV every 4 weeks'
+    ],
+    defaultDose: '1200 mg IV every 3 weeks',
+    infusionTime: 'over 60 minutes for the first infusion; 30 minutes for subsequent infusions if tolerated',
+    premedication: 'No routine premedication required. Manage infusion reactions as per institutional protocol.',
+    storage: 'Refrigerate at 2–8°C. Do not freeze. Protect from light.',
+    indications: [
+      'Non–small cell lung carcinoma',
+      'Small-cell lung cancer',
+      'Triple-negative breast cancer where indicated',
+      'Hepatocellular carcinoma and urothelial carcinoma as per approved protocols'
+    ],
+    monitoring: 'Baseline and pre-cycle CBC, LFT, RFT, TFT, blood glucose; clinical surveillance for immune-related adverse events including pneumonitis, colitis, hepatitis, endocrinopathies and dermatitis.'
+  },
+  {
     id: 'tislelizumab',
     generic: 'Tislelizumab',
     brands: ['Tevimbra'],
@@ -95,5 +119,26 @@ window.DRUGS = [
       'Hepatocellular carcinoma'
     ],
     monitoring: 'Pre-cycle CBC, LFT, RFT, TFT and blood glucose. Surveillance for irAEs and infusion-related reactions, particularly during the first cycle.'
+  },
+  {
+    id: 'osimertinib',
+    generic: 'Osimertinib',
+    brands: ['Tagrisso'],
+    class: 'EGFR tyrosine kinase inhibitor',
+    prescriptionPrefix: 'Tab.',
+    standardDoses: [
+      '80 mg oral once daily',
+      '40 mg oral once daily (dose reduction)'
+    ],
+    defaultDose: '80 mg oral once daily',
+    infusionTime: 'Oral therapy; no infusion required.',
+    premedication: 'No routine premedication required.',
+    storage: 'Store at room temperature as per manufacturer guidance. Protect from moisture.',
+    indications: [
+      'EGFR-mutated non–small cell lung carcinoma',
+      'Adjuvant therapy after resection in EGFR-mutated NSCLC where indicated',
+      'EGFR T790M-positive disease after prior EGFR TKI therapy'
+    ],
+    monitoring: 'Baseline and periodic CBC, LFT, ECG/QTc assessment where clinically indicated, and monitoring for diarrhoea, rash, pneumonitis / ILD symptoms and cardiac dysfunction.'
   }
 ];

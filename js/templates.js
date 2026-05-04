@@ -288,7 +288,8 @@
       const brand = drug ? (d.brand || drug.brands[0]) : (d.brand || '[Brand]');
       const dose = drug ? (d.dose || drug.defaultDose) : (d.dose || '[Dose & schedule]');
       const doseMg = extractMg(dose);
-      const vialBreak = doseMg && drug ? splitIntoVials(doseMg, drug.vialSizes || [100]) : '';
+      const vialBreak = doseMg && drug && drug.vialSizes ? splitIntoVials(doseMg, drug.vialSizes) : '';
+      const prescriptionPrefix = drug && drug.prescriptionPrefix ? drug.prescriptionPrefix : 'Inj.';
 
       const title = d.sex === 'Female' ? 'Ms.' : (d.sex === 'Male' ? 'Mr.' : '');
       const sexWord = d.sex === 'Female' ? 'female' : (d.sex === 'Male' ? 'male' : 'patient');
@@ -326,7 +327,7 @@
 
         <div class="rx-big">Rx</div>
 
-        <div class="rx-drug-line">Inj. ${esc(generic.toUpperCase())} ( ${esc(brand)} ) ${doseMg ? doseMg + ' mg' : esc(dose)}</div>
+        <div class="rx-drug-line">${esc(prescriptionPrefix)} ${esc(generic.toUpperCase())} ( ${esc(brand)} ) ${doseMg && vialBreak ? doseMg + ' mg' : esc(dose)}</div>
         ${vialBreak ? `<div class="rx-vial-line">( ${vialBreak} )</div>` : ''}
 
         <div class="rx-spacer"></div>
