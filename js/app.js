@@ -3,6 +3,7 @@
    ======================================================================== */
 
 (function () {
+  const LETTER_TIME_ZONE = 'Asia/Kolkata';
   const params = new URLSearchParams(location.search);
   const type = params.get('type');
   const tmpl = window.TEMPLATES && window.TEMPLATES[type];
@@ -167,10 +168,22 @@
   }
 
   function setDefaults() {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayIso(LETTER_TIME_ZONE);
     formEl.querySelectorAll('input[type="date"]').forEach(inp => {
       if (!inp.value) inp.value = today;
     });
+  }
+
+  function todayIso(timeZone) {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(new Date());
+
+    const byType = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return `${byType.year}-${byType.month}-${byType.day}`;
   }
 
   function hookDrugChange() {

@@ -62,8 +62,9 @@
 
   function formatDate(iso) {
     if (!iso) return '';
-    const d = new Date(iso);
-    if (isNaN(d)) return iso;
+    const parts = parseIsoDate(iso);
+    if (!parts) return iso;
+    const d = new Date(parts.year, parts.month - 1, parts.day);
     return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
@@ -192,9 +193,22 @@
 
   function daysBetween(a, b) {
     if (!a || !b) return '';
-    const ms = new Date(b) - new Date(a);
+    const start = parseIsoDate(a);
+    const end = parseIsoDate(b);
+    if (!start || !end) return '';
+    const ms = Date.UTC(end.year, end.month - 1, end.day) - Date.UTC(start.year, start.month - 1, start.day);
     if (isNaN(ms)) return '';
     return Math.round(ms / 86400000) + 1;
+  }
+
+  function parseIsoDate(value) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (!match) return null;
+    return {
+      year: Number(match[1]),
+      month: Number(match[2]),
+      day: Number(match[3])
+    };
   }
 
   // ============================================================
