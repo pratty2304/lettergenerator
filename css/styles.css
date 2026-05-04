@@ -53,10 +53,10 @@ a:hover { text-decoration: underline; }
   border-bottom: 1px solid var(--line);
 }
 .site-header .logo {
-  height: 48px;
+  height: 64px;
   width: auto;
 }
-.site-header .logo.small { height: 38px; }
+.site-header .logo.small { height: 46px; }
 .site-header .tagline {
   margin-left: auto;
   font-weight: 500;
