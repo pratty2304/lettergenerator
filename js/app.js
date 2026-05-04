@@ -33,7 +33,7 @@
   generateBtn.addEventListener('click', generate);
   printBtn.addEventListener('click', () => {
     // ensure preview is up-to-date if user hasn't generated yet
-    if (!previewEl.dataset.generated) generate();
+    if (!previewEl.dataset.generated && !generate()) return;
 
     // Set document.title so the browser's "Save as PDF" suggests
     // "<Patient name> - <Letter type>.pdf" as the filename.
@@ -53,15 +53,16 @@
   });
   resetBtn.addEventListener('click', () => {
     formEl.reset();
-    previewEl.innerHTML = '<div class="empty-state"><p>Fill the form and click <strong>Generate</strong> to preview the letter.</p></div>';
-    previewEl.removeAttribute('data-generated');
-    previewEl.contentEditable = 'false';
     setDefaults();
     refreshDrugFields();
+    updateLivePreview();
   });
+  formEl.addEventListener('input', updateLivePreview);
+  formEl.addEventListener('change', updateLivePreview);
 
   setDefaults();
   refreshDrugFields();
+  updateLivePreview();
 
   // ============================================================
   function buildForm(fields) {
@@ -189,7 +190,10 @@
   function hookDrugChange() {
     const drugSel = formEl.querySelector('select[name="drugId"]');
     if (!drugSel) return;
-    drugSel.addEventListener('change', refreshDrugFields);
+    drugSel.addEventListener('change', () => {
+      refreshDrugFields();
+      updateLivePreview();
+    });
   }
 
   function refreshDrugFields() {
@@ -218,11 +222,17 @@
       const addBtn = list.querySelector('.btn-add-drug');
       // Seed with one empty row
       rowsEl.appendChild(makeDrugRow());
-      addBtn.addEventListener('click', () => rowsEl.appendChild(makeDrugRow()));
+      addBtn.addEventListener('click', () => {
+        rowsEl.appendChild(makeDrugRow());
+        updateLivePreview();
+      });
       rowsEl.addEventListener('click', (e) => {
         if (e.target && e.target.classList.contains('dl-remove')) {
           const row = e.target.closest('.drug-list-row');
-          if (row && rowsEl.children.length > 1) row.remove();
+          if (row && rowsEl.children.length > 1) {
+            row.remove();
+            updateLivePreview();
+          }
         }
       });
     });
@@ -285,23 +295,36 @@
     return data;
   }
 
+  function updateLivePreview() {
+    renderPreview({ validate: false, editable: false, scroll: false });
+  }
+
   function generate() {
-    const data = readForm();
+    return renderPreview({ validate: true, editable: true, scroll: true });
+  }
+
+  function renderPreview(options) {
+    const data = options.validate ? readForm() : makeDraftData(readForm());
 
     // Basic validation
-    const missing = (tmpl.fields || []).filter(f => {
-      if (!f.required) return false;
-      const v = data[f.name];
-      if (Array.isArray(v)) return v.length === 0;
-      return !v;
-    });
-    if (missing.length) {
-      alert('Please complete: ' + missing.map(f => f.label).join(', '));
-      return;
+    if (options.validate) {
+      const missing = (tmpl.fields || []).filter(f => {
+        if (!f.required) return false;
+        const v = data[f.name];
+        if (Array.isArray(v)) return v.length === 0;
+        return !v;
+      });
+      if (missing.length) {
+        alert('Please complete: ' + missing.map(f => f.label).join(', '));
+        return false;
+      }
     }
 
-    const doc = (window.DOCTORS || []).find(d => d.id === data.consultantId);
-    if (!doc) { alert('Please select a signing consultant.'); return; }
+    const doc = getDoctor(data.consultantId, options.validate);
+    if (!doc) {
+      alert('Please select a signing consultant.');
+      return false;
+    }
 
     let body;
     try {
@@ -317,8 +340,56 @@
       ${body}
     `;
     previewEl.innerHTML = html;
-    previewEl.contentEditable = 'true';
-    previewEl.dataset.generated = '1';
-    previewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    previewEl.contentEditable = options.editable ? 'true' : 'false';
+    if (options.editable) previewEl.dataset.generated = '1';
+    else previewEl.removeAttribute('data-generated');
+    if (options.scroll) previewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return true;
+  }
+
+  function makeDraftData(data) {
+    const draft = { ...data };
+    hydrateDraftDrugFields(draft);
+    (tmpl.fields || []).forEach(f => {
+      const current = draft[f.name];
+      if (Array.isArray(current)) return;
+      if (current) return;
+      if (f.type === 'date') draft[f.name] = todayIso(LETTER_TIME_ZONE);
+      else if (f.required) draft[f.name] = placeholderFor(f);
+    });
+    return draft;
+  }
+
+  function hydrateDraftDrugFields(draft) {
+    const hasField = (name) => (tmpl.fields || []).some(f => f.name === name);
+    if (!hasField('drugId')) return;
+    const drugs = window.DRUGS || [];
+    const drug = drugs.find(d => d.id === draft.drugId) || drugs[0];
+    if (!drug) return;
+    if (!draft.drugId) draft.drugId = drug.id;
+    if (hasField('brand') && !draft.brand) draft.brand = drug.brands[0];
+    if (hasField('dose') && !draft.dose) draft.dose = drug.defaultDose;
+  }
+
+  function placeholderFor(field) {
+    if (field.name === 'sex') return '';
+    if (field.name === 'age') return '__';
+    if (field.type === 'select' && field.options && field.options.length) {
+      const first = field.options[0];
+      return typeof first === 'string' ? first : first.value;
+    }
+    return `[${field.label.replace(/\s*\*$/, '')}]`;
+  }
+
+  function getDoctor(consultantId, validate) {
+    const doctor = (window.DOCTORS || []).find(d => d.id === consultantId);
+    if (doctor || validate) return doctor;
+    return {
+      name: '[Signing consultant]',
+      qualifications: '[Qualifications]',
+      designation: '[Designation]',
+      institute: 'KIMS Hospitals, Bengaluru',
+      kmc: '[KMC No]'
+    };
   }
 })();

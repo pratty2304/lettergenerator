@@ -73,12 +73,32 @@
   }
 
   function pronoun(sex, kind) {
-    const m = sex === 'Male';
-    if (kind === 'subj') return m ? 'he' : 'she';
-    if (kind === 'subjC') return m ? 'He' : 'She';
-    if (kind === 'obj') return m ? 'him' : 'her';
-    if (kind === 'poss') return m ? 'his' : 'her';
-    if (kind === 'possC') return m ? 'His' : 'Her';
+    if (sex === 'Male') {
+      if (kind === 'subj') return 'he';
+      if (kind === 'subjC') return 'He';
+      if (kind === 'obj') return 'him';
+      if (kind === 'poss') return 'his';
+      if (kind === 'possC') return 'His';
+    }
+    if (sex === 'Female') {
+      if (kind === 'subj') return 'she';
+      if (kind === 'subjC') return 'She';
+      if (kind === 'obj') return 'her';
+      if (kind === 'poss') return 'her';
+      if (kind === 'possC') return 'Her';
+    }
+    if (sex === 'Other') {
+      if (kind === 'subj') return 'they';
+      if (kind === 'subjC') return 'They';
+      if (kind === 'obj') return 'them';
+      if (kind === 'poss') return 'their';
+      if (kind === 'possC') return 'Their';
+    }
+    if (kind === 'subj') return 'he/she';
+    if (kind === 'subjC') return 'He/She';
+    if (kind === 'obj') return 'him/her';
+    if (kind === 'poss') return 'his/her';
+    if (kind === 'possC') return 'His/Her';
     return '';
   }
 
