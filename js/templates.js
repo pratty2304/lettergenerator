@@ -64,8 +64,10 @@
     if (!iso) return '';
     const parts = parseIsoDate(iso);
     if (!parts) return iso;
-    const d = new Date(parts.year, parts.month - 1, parts.day);
-    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+    const dd = String(parts.day).padStart(2, '0');
+    const mm = String(parts.month).padStart(2, '0');
+    const yyyy = String(parts.year).padStart(4, '0');
+    return `${dd}/${mm}/${yyyy}`;
   }
 
   function randomRef() {
