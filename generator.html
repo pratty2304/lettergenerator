@@ -13,7 +13,7 @@
     <div class="tagline" id="letterTitle">Letter</div>
   </header>
 
-  <main class="generator-shell">
+  <main class="generator-shell" aria-busy="true">
     <aside class="form-panel no-print">
       <h2 class="panel-title">Letter details</h2>
       <form id="letterForm" autocomplete="off"></form>
@@ -27,6 +27,9 @@
 
     <section class="preview-panel">
       <article id="letterPreview" class="letter-page" contenteditable="false">
+        <div class="empty-state">
+          <p>Preparing letter draft...</p>
+        </div>
       </article>
     </section>
   </main>

@@ -17,6 +17,8 @@
   if (!tmpl) {
     titleEl.textContent = 'Unknown letter';
     formEl.innerHTML = '<p style="color:#a14;">Letter type not found. <a href="index.html">Go back</a>.</p>';
+    document.querySelector('.generator-shell')?.removeAttribute('aria-busy');
+    document.body.classList.add('is-ready');
     return;
   }
 
@@ -63,6 +65,8 @@
   setDefaults();
   refreshDrugFields();
   updateLivePreview();
+  document.querySelector('.generator-shell')?.removeAttribute('aria-busy');
+  document.body.classList.add('is-ready');
 
   // ============================================================
   function buildForm(fields) {
