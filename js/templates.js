@@ -977,6 +977,92 @@
   };
 
   // ============================================================
+  // TEMPLATE: Prognosis Counselling / Guarded Prognosis Explained
+  // ============================================================
+  const prognosisCounselling = {
+    title: 'Prognosis Counselling Letter',
+    fields: [
+      F.patientName, F.age, F.sex, F.mrn, F.diagnosis,
+      { name: 'attenderName', label: 'Attender / family member counselled', type: 'text', required: true },
+      { name: 'relationship', label: 'Relationship to patient', type: 'select', required: true,
+        options: ['Spouse', 'Son', 'Daughter', 'Parent', 'Sibling', 'Other family member', 'Authorised attendant'] },
+      { name: 'counsellingDate', label: 'Date of counselling', type: 'date', required: true, default: 'today' },
+      { name: 'clinicalStatus', label: 'Current clinical status', type: 'textarea', required: true,
+        placeholder: 'e.g. Advanced metastatic disease with declining performance status, poor oral intake, ongoing infection / organ dysfunction / progressive disease despite treatment' },
+      { name: 'prognosisConcerns', label: 'Reasons for guarded / poor prognosis', type: 'textarea', required: true,
+        placeholder: 'e.g. High disease burden, poor performance status, progressive disease on prior lines, sepsis, cytopenias, organ dysfunction, limited treatment reserve' },
+      { name: 'risksDiscussed', label: 'Risks / possible deterioration discussed', type: 'textarea',
+        placeholder: 'e.g. Worsening disease, infection / sepsis, bleeding, respiratory distress, renal / liver dysfunction, ICU need, ventilator / inotrope support, sudden cardiac event, death' },
+      { name: 'treatmentIntent', label: 'Current treatment intent / approach', type: 'select', required: true,
+        options: [
+          'Palliative systemic therapy with best supportive care',
+          'Best supportive care / symptom-directed care',
+          'Active treatment subject to clinical fitness and organ function',
+          'Further treatment options limited; supportive care prioritised',
+          'Under reassessment after investigations / multidisciplinary review'
+        ] },
+      { name: 'recommendedTreatment', label: 'Treatment / intervention advised', type: 'textarea',
+        placeholder: 'e.g. Admission, antibiotics, oxygen / ICU care, transfusion, chemotherapy / immunotherapy if fit, palliative procedures, pain control, nutrition and supportive care' },
+      { name: 'attenderDecision', label: 'Attender / family decision after counselling', type: 'select', required: true,
+        options: [
+          'Agreed for advised treatment / supportive care',
+          'Declined advised treatment after counselling',
+          'Deferred decision / wants time to discuss with family',
+          'Requested discharge / transfer despite medical advice',
+          'Declined ICU / ventilator / inotrope escalation if required',
+          'Opted for comfort-focused care only'
+        ] },
+      { name: 'refusalDetails', label: 'Reason / details if treatment declined or deferred', type: 'textarea',
+        placeholder: 'e.g. Financial constraints, preference for treatment elsewhere, wants to take patient home, understands risk of deterioration and death' },
+      { name: 'carePlan', label: 'Plan explained to attender', type: 'textarea', required: true,
+        placeholder: 'e.g. Continue supportive care, antibiotics, transfusion support, pain control, nutrition, oxygen as needed; reassess for further anticancer therapy if clinically stable' },
+      { name: 'extraNotes', label: 'Additional notes (optional)', type: 'textarea',
+        placeholder: 'e.g. Questions answered; family advised to keep close communication with treating team; emergency warning signs explained' },
+      F.letterDate, F.consultant
+    ],
+    render(d, doc) {
+      const risks = d.risksDiscussed ||
+        'worsening disease burden, infection / sepsis, bleeding, respiratory distress, renal or liver dysfunction, metabolic complications, need for ICU-level care including ventilator or inotrope support, sudden clinical deterioration, and death despite appropriate medical treatment';
+
+      return `
+        ${heading('Prognosis Counselling / Guarded Prognosis Explained')}
+        ${meta(d.letterDate)}
+        <p class="salutation">To Whomsoever It May Concern,</p>
+        ${patientBlock(d)}
+        <div class="body">
+          <p>This is to document that <strong>${esc(d.attenderName)}</strong> (${esc(d.relationship)} of the patient) was counselled in detail on <strong>${formatDate(d.counsellingDate)}</strong> regarding the patient’s current oncological condition, treatment status and guarded prognosis.</p>
+          <p><strong>Current clinical status:</strong> ${esc(d.clinicalStatus)}.</p>
+          <p>The attender was explained that the patient has <strong>${esc(d.diagnosis)}</strong> and that the overall prognosis is guarded / poor in view of the following clinical factors: ${esc(d.prognosisConcerns)}.</p>
+          <p>It was clearly explained that the clinical condition may worsen despite appropriate treatment and monitoring. The possible risks discussed included ${esc(risks)}.</p>
+          <p>The family was informed that further anticancer treatment, if any, would depend on the patient’s performance status, organ function, infection control, blood counts, treatment tolerance and overall clinical stability. It was also explained that in the event of significant deterioration, the focus of care may need to shift towards symptom relief, comfort, prevention of suffering and best supportive care.</p>
+          <p><strong>Current treatment intent / approach:</strong> ${esc(d.treatmentIntent)}.</p>
+          ${d.recommendedTreatment ? `<p><strong>Treatment / intervention advised:</strong> ${esc(d.recommendedTreatment)}.</p>` : ''}
+          <p><strong>Attender / family decision after counselling:</strong> ${esc(d.attenderDecision)}.</p>
+          ${/declined|deferred|requested discharge|declined icu|comfort-focused/i.test(d.attenderDecision || '') ? `
+            <p>It was specifically explained that refusal, deferral or limitation of the advised treatment / escalation may result in worsening symptoms, irreversible clinical deterioration, avoidable complications and death. The attender / family member stated that they understood these risks.</p>
+          ` : ''}
+          ${d.refusalDetails ? `<p><strong>Reason / details documented:</strong> ${esc(d.refusalDetails)}.</p>` : ''}
+          <p><strong>Plan explained:</strong> ${esc(d.carePlan)}.</p>
+          <p>The attender was encouraged to ask questions, and the above information was explained in understandable language. The seriousness of the condition, possibility of sudden deterioration, and need for urgent medical attention in case of worsening symptoms were reiterated.</p>
+          ${d.extraNotes ? `<p><strong>Additional notes:</strong> ${esc(d.extraNotes)}</p>` : ''}
+          <p>This letter is issued as a record of the counselling discussion held with the patient’s attender / family member and should be interpreted along with the treating team’s ongoing clinical notes and treatment orders.</p>
+        </div>
+        <div class="dual-signoff">
+          ${signoff(doc)}
+          <div class="attender-signoff">
+            <p>Attender / Family Member Signature</p>
+            <div class="sig-space"></div>
+            <div class="attender-line"></div>
+            <div class="attender-meta">
+              Name: ${esc(d.attenderName)}<br/>
+              Relationship: ${esc(d.relationship)}
+            </div>
+          </div>
+        </div>`;
+    }
+  };
+
+  // ============================================================
   window.TEMPLATES = {
     'medical-certificate':  medicalCertificate,
     'leave-of-absence':     leaveOfAbsence,
@@ -991,5 +1077,6 @@
     'path-slides':          pathSlides,
     'genomic-test':         genomicTest,
     'continuing-care':      continuingCare,
+    'prognosis-counselling': prognosisCounselling,
   };
 })();

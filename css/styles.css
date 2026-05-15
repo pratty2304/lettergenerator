@@ -365,6 +365,37 @@ body.generator.is-ready .generator-shell {
   color: #4a5876;
   line-height: 1.45;
 }
+.letter-page .dual-signoff {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.8fr);
+  gap: 42px;
+  align-items: end;
+  margin-top: 38px;
+}
+.letter-page .dual-signoff .signoff {
+  margin-top: 0;
+}
+.letter-page .attender-signoff {
+  font-family: var(--font-sans);
+  font-size: 10.5pt;
+}
+.letter-page .attender-signoff p {
+  margin: 0 0 6px;
+  text-align: left;
+  font-weight: 600;
+}
+.letter-page .attender-signoff .sig-space {
+  height: 50px;
+}
+.letter-page .attender-signoff .attender-line {
+  border-top: 1px solid #1a1a1a;
+  width: 100%;
+  margin-bottom: 6px;
+}
+.letter-page .attender-signoff .attender-meta {
+  color: #4a5876;
+  line-height: 1.45;
+}
 .letter-page .rx-table {
   width: 100%;
   border-collapse: collapse;
@@ -742,6 +773,12 @@ body.generator.is-ready .generator-shell {
   .letter-page .signoff .sig-space { height: 36px; }
   .letter-page .signoff .doctor-name { font-size: 14px; }
   .letter-page .signoff .doctor-meta { font-size: 12.5px; }
+  .letter-page .dual-signoff {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+  .letter-page .attender-signoff .sig-space { height: 36px; }
 
   /* Form fields — stack drug-list to 1 column for narrow phones */
   .drug-list-row {
