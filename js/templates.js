@@ -917,6 +917,91 @@
     }
   };
 
+  const DEFAULT_GENOMIC_TEST_OPTIONS = [
+    'Comprehensive solid tumour NGS panel (DNA + RNA)',
+    'Liquid biopsy / cell-free DNA NGS',
+    'Targeted somatic panel (specify in notes)',
+    'Germline multigene panel (hereditary cancer)',
+    'BRCA1 / BRCA2 germline testing',
+    'Homologous Recombination Repair (HRR) panel',
+    'Microsatellite instability (MSI) / MMR testing',
+    'Tumour Mutational Burden (TMB)',
+    'Single gene test (specify in notes)'
+  ];
+
+  const FOURBASECARE_TEST_OPTIONS = [
+    {
+      value: 'TARGT First',
+      label: 'TARGT First',
+      category: 'Solid',
+      measures: '92 commonly mutated genes',
+      sampleType: 'FFPE tissue (solid biopsy)'
+    },
+    {
+      value: 'TARGT Indiegene',
+      label: 'TARGT Indiegene',
+      category: 'Solid',
+      measures: 'Cancer-relevant genomic alterations',
+      sampleType: 'FFPE tissue (solid biopsy)'
+    },
+    {
+      value: 'TARGT Absolute',
+      label: 'TARGT Absolute',
+      category: 'Solid',
+      measures: 'AI-driven comprehensive genomic insights',
+      sampleType: 'FFPE tissue (solid biopsy)'
+    },
+    {
+      value: 'TARGT First Liquid',
+      label: 'TARGT First Liquid',
+      category: 'Liquid',
+      measures: '92 commonly mutated genes',
+      sampleType: 'Blood / ctDNA (liquid biopsy)'
+    },
+    {
+      value: 'Indigene Liquid',
+      label: 'Indigene Liquid',
+      category: 'Liquid',
+      measures: 'ctDNA genomic insights',
+      sampleType: 'Blood / ctDNA (liquid biopsy)'
+    },
+    {
+      value: 'First SoLiQ™',
+      label: 'First SoLiQ™',
+      category: 'SoLiQ',
+      measures: '92 commonly mutated genes',
+      sampleType: 'Tissue + blood'
+    },
+    {
+      value: 'Indigene SoLiQ™',
+      label: 'Indigene SoLiQ™',
+      category: 'SoLiQ',
+      measures: 'Dual-source multidimensional genomic insights',
+      sampleType: 'Tissue + blood'
+    },
+    {
+      value: 'Absolute SoLiQ™',
+      label: 'Absolute SoLiQ™',
+      category: 'SoLiQ',
+      measures: 'Whole-exome DNA and RNA analysis',
+      sampleType: 'Tissue + blood'
+    },
+    {
+      value: 'HRD',
+      label: 'HRD',
+      category: 'HRD',
+      measures: 'Genome-wide copy-number scars and 20-gene HRR pathway alterations',
+      sampleType: 'FFPE tissue (DNA)'
+    },
+    {
+      value: 'Germline+',
+      label: 'Germline+',
+      category: 'Germline',
+      measures: '163 genes',
+      sampleType: 'Blood / gDNA'
+    }
+  ];
+
   // ============================================================
   // TEMPLATE: Genomic / NGS / Germline Test Request
   // ============================================================
@@ -924,20 +1009,16 @@
     title: 'Genomic / NGS Test Request',
     fields: [
       F.patientName, F.age, F.sex, F.mrn, F.diagnosis,
-      { name: 'geneLab', label: 'Genomic lab addressed', type: 'text',
-        placeholder: 'e.g. Strand Life Sciences / MedGenome / 4baseCare / Datar Genetics' },
-      { name: 'testType', label: 'Test requested', type: 'select', required: true,
+      { name: 'geneLab', label: 'Genomic lab addressed', type: 'select', required: true,
         options: [
-          'Comprehensive solid tumour NGS panel (DNA + RNA)',
-          'Liquid biopsy / cell-free DNA NGS',
-          'Targeted somatic panel (specify in notes)',
-          'Germline multigene panel (hereditary cancer)',
-          'BRCA1 / BRCA2 germline testing',
-          'Homologous Recombination Repair (HRR) panel',
-          'Microsatellite instability (MSI) / MMR testing',
-          'Tumour Mutational Burden (TMB)',
-          'Single gene test (specify in notes)'
+          { value: '4basecare', label: '4baseCare' },
+          { value: 'medgenome', label: 'MedGenome' },
+          { value: 'others', label: 'Others' }
         ] },
+      { name: 'geneLabOther', label: 'Other lab / address', type: 'text',
+        placeholder: 'e.g. Strand Life Sciences / Datar Genetics / other lab' },
+      { name: 'testType', label: 'Test requested', type: 'select', required: true,
+        options: DEFAULT_GENOMIC_TEST_OPTIONS },
       { name: 'specimenType', label: 'Specimen type', type: 'select',
         options: [
           'FFPE block + H&E slide',
@@ -953,8 +1034,15 @@
       F.letterDate, F.consultant
     ],
     render(d, doc) {
-      const addressee = d.geneLab ? esc(d.geneLab) : 'The Molecular Diagnostics Laboratory';
+      const labName = genomicLabName(d);
+      const addressee = labName ? esc(labName) : 'The Molecular Diagnostics Laboratory';
       const test = d.testType || '';
+      const fourBaseCareTest = d.geneLab === '4basecare'
+        ? FOURBASECARE_TEST_OPTIONS.find(x => x.value === test)
+        : null;
+      const testDetails = fourBaseCareTest
+        ? `<p><strong>Test details:</strong> ${esc(fourBaseCareTest.category)}; ${esc(fourBaseCareTest.measures)}; sample type: ${esc(fourBaseCareTest.sampleType)}.</p>`
+        : '';
       const isGermline = /germline|brca|hereditary/i.test(test);
       const indicationLine = isGermline
         ? 'The result will guide assessment of hereditary cancer predisposition, family counselling and personalised treatment decisions including consideration of PARP inhibitor therapy where indicated.'
@@ -967,6 +1055,7 @@
         <div class="body">
           <p>The above-named patient is currently under our care at the Department of Medical Oncology, KIMS MACS Onco Sciences, Bengaluru.</p>
           <p>Kindly process the sample submitted herewith for <strong>${esc(test)}</strong>${d.specimenType ? ` on the provided <strong>${esc(d.specimenType)}</strong>` : ''}${d.specimenRef ? ` (<strong>${esc(d.specimenRef)}</strong>)` : ''}.</p>
+          ${testDetails}
           <p>${indicationLine}</p>
           ${d.extraNotes ? `<p><strong>Additional clinical context:</strong> ${esc(d.extraNotes)}</p>` : ''}
           <p>The patient and / or family have been counselled regarding the rationale, scope and limitations of the test, the expected turnaround time and applicable charges, and have provided informed consent for sample processing and reporting. Kindly share the final report with our department at the earliest convenience.</p>
@@ -975,6 +1064,13 @@
         ${signoff(doc)}`;
     }
   };
+
+  function genomicLabName(d) {
+    if (d.geneLab === '4basecare') return '4baseCare';
+    if (d.geneLab === 'medgenome') return 'MedGenome';
+    if (d.geneLab === 'others') return d.geneLabOther || 'The Molecular Diagnostics Laboratory';
+    return d.geneLab || '';
+  }
 
   // ============================================================
   // TEMPLATE: Prognosis Counselling / Guarded Prognosis Explained
@@ -1063,6 +1159,11 @@
   };
 
   // ============================================================
+  window.GENOMIC_TEST_OPTIONS = {
+    default: DEFAULT_GENOMIC_TEST_OPTIONS,
+    fourbasecare: FOURBASECARE_TEST_OPTIONS
+  };
+
   window.TEMPLATES = {
     'medical-certificate':  medicalCertificate,
     'leave-of-absence':     leaveOfAbsence,

@@ -13,6 +13,7 @@
   const generateBtn = document.getElementById('generateBtn');
   const printBtn = document.getElementById('printBtn');
   const resetBtn = document.getElementById('resetBtn');
+  let previewHasManualEdits = false;
 
   if (!tmpl) {
     titleEl.textContent = 'Unknown letter';
@@ -28,14 +29,14 @@
   // ---------- Build form ----------
   buildForm(tmpl.fields);
   hookDrugChange();
+  hookGenomicLabChange();
   hookLetterheadToggle();
   hookDrugList();
 
   // ---------- Buttons ----------
   generateBtn.addEventListener('click', generate);
   printBtn.addEventListener('click', () => {
-    // ensure preview is up-to-date if user hasn't generated yet
-    if (!previewEl.dataset.generated && !generate()) return;
+    if (!validateForFinalOutput()) return;
 
     // Set document.title so the browser's "Save as PDF" suggests
     // "<Patient name> - <Letter type>.pdf" as the filename.
@@ -55,15 +56,22 @@
   });
   resetBtn.addEventListener('click', () => {
     formEl.reset();
+    previewHasManualEdits = false;
     setDefaults();
     refreshDrugFields();
+    refreshGenomicFields();
     updateLivePreview();
   });
   formEl.addEventListener('input', updateLivePreview);
   formEl.addEventListener('change', updateLivePreview);
+  previewEl.addEventListener('input', () => {
+    previewHasManualEdits = true;
+    previewEl.dataset.manualEdits = '1';
+  });
 
   setDefaults();
   refreshDrugFields();
+  refreshGenomicFields();
   updateLivePreview();
   document.querySelector('.generator-shell')?.removeAttribute('aria-busy');
   document.body.classList.add('is-ready');
@@ -220,6 +228,50 @@
     }
   }
 
+  function hookGenomicLabChange() {
+    const labSel = formEl.querySelector('select[name="geneLab"]');
+    if (!labSel) return;
+    labSel.addEventListener('change', refreshGenomicFields);
+  }
+
+  function refreshGenomicFields() {
+    const labSel = formEl.querySelector('select[name="geneLab"]');
+    if (!labSel) return;
+
+    const lab = labSel.value;
+    toggleField('geneLabOther', lab === 'others');
+
+    const testSel = formEl.querySelector('select[name="testType"]');
+    if (!testSel || !window.GENOMIC_TEST_OPTIONS) return;
+
+    const options = lab === '4basecare'
+      ? window.GENOMIC_TEST_OPTIONS.fourbasecare
+      : window.GENOMIC_TEST_OPTIONS.default;
+    if (!Array.isArray(options)) return;
+
+    const current = testSel.value;
+    testSel.innerHTML = '<option value="">— Select —</option>' + options.map(renderOption).join('');
+    if (options.some(o => optionValue(o) === current)) testSel.value = current;
+  }
+
+  function toggleField(name, visible) {
+    const input = formEl.querySelector(`[name="${name}"]`);
+    if (!input) return;
+    const field = input.closest('.field');
+    if (field) field.hidden = !visible;
+    input.disabled = !visible;
+    if (!visible) input.value = '';
+  }
+
+  function renderOption(o) {
+    if (typeof o === 'string') return `<option value="${escapeAttr(o)}">${escapeAttr(o)}</option>`;
+    return `<option value="${escapeAttr(o.value)}">${escapeAttr(o.label)}</option>`;
+  }
+
+  function optionValue(o) {
+    return typeof o === 'string' ? o : o.value;
+  }
+
   function hookDrugList() {
     formEl.querySelectorAll('.drug-list').forEach(list => {
       const rowsEl = list.querySelector('.drug-list-rows');
@@ -300,29 +352,22 @@
   }
 
   function updateLivePreview() {
-    renderPreview({ validate: false, editable: false, scroll: false });
+    if (previewHasManualEdits) return true;
+    return renderPreview({ validate: false, scroll: false });
   }
 
   function generate() {
-    return renderPreview({ validate: true, editable: true, scroll: true });
+    const ok = renderPreview({ validate: true, scroll: true });
+    if (ok) previewHasManualEdits = false;
+    return ok;
   }
 
   function renderPreview(options) {
-    const data = options.validate ? readForm() : makeDraftData(readForm());
+    const rawData = readForm();
+    const data = options.validate ? rawData : makeDraftData(rawData);
 
     // Basic validation
-    if (options.validate) {
-      const missing = (tmpl.fields || []).filter(f => {
-        if (!f.required) return false;
-        const v = data[f.name];
-        if (Array.isArray(v)) return v.length === 0;
-        return !v;
-      });
-      if (missing.length) {
-        alert('Please complete: ' + missing.map(f => f.label).join(', '));
-        return false;
-      }
-    }
+    if (options.validate && !validateRequiredFields(rawData)) return false;
 
     const doc = getDoctor(data.consultantId, options.validate);
     if (!doc) {
@@ -344,10 +389,35 @@
       ${body}
     `;
     previewEl.innerHTML = html;
-    previewEl.contentEditable = options.editable ? 'true' : 'false';
-    if (options.editable) previewEl.dataset.generated = '1';
+    previewEl.contentEditable = 'true';
+    previewEl.removeAttribute('data-manual-edits');
+    if (options.validate) previewEl.dataset.generated = '1';
     else previewEl.removeAttribute('data-generated');
     if (options.scroll) previewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return true;
+  }
+
+  function validateForFinalOutput() {
+    const data = readForm();
+    if (!validateRequiredFields(data)) return false;
+    if (!getDoctor(data.consultantId, true)) {
+      alert('Please select a signing consultant.');
+      return false;
+    }
+    return true;
+  }
+
+  function validateRequiredFields(data) {
+    const missing = (tmpl.fields || []).filter(f => {
+      if (!f.required) return false;
+      const v = data[f.name];
+      if (Array.isArray(v)) return v.length === 0;
+      return !v;
+    });
+    if (missing.length) {
+      alert('Please complete: ' + missing.map(f => f.label).join(', '));
+      return false;
+    }
     return true;
   }
 

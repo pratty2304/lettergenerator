@@ -291,6 +291,9 @@ body.generator.is-ready .generator-shell {
   color: #1a1a1a;
 }
 .letter-page[contenteditable="true"] {
+  cursor: text;
+}
+.letter-page[contenteditable="true"]:focus {
   outline: 2px dashed var(--c-sky);
   outline-offset: -8px;
 }
@@ -351,6 +354,13 @@ body.generator.is-ready .generator-shell {
 }
 .letter-page .signoff {
   margin-top: 38px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.letter-page .signoff p,
+.letter-page .signoff .sig-space {
+  break-after: avoid;
+  page-break-after: avoid;
 }
 .letter-page .signoff .sig-space { height: 50px; }
 .letter-page .signoff .doctor-name {
@@ -358,12 +368,18 @@ body.generator.is-ready .generator-shell {
   font-family: var(--font-sans);
   font-size: 12pt;
   margin-top: 4px;
+  break-after: avoid;
+  page-break-after: avoid;
 }
 .letter-page .signoff .doctor-meta {
   font-family: var(--font-sans);
   font-size: 10.5pt;
   color: #4a5876;
   line-height: 1.45;
+  break-before: avoid;
+  break-inside: avoid;
+  page-break-before: avoid;
+  page-break-inside: avoid;
 }
 .letter-page .dual-signoff {
   display: grid;
@@ -371,6 +387,8 @@ body.generator.is-ready .generator-shell {
   gap: 42px;
   align-items: end;
   margin-top: 38px;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .letter-page .dual-signoff .signoff {
   margin-top: 0;
@@ -378,6 +396,8 @@ body.generator.is-ready .generator-shell {
 .letter-page .attender-signoff {
   font-family: var(--font-sans);
   font-size: 10.5pt;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .letter-page .attender-signoff p {
   margin: 0 0 6px;
@@ -488,14 +508,29 @@ body.generator.is-ready .generator-shell {
 .letter-page .rx-signoff {
   font-family: var(--font-sans);
   margin-top: 30px;
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 .letter-page .rx-signoff .rx-sig-line {
   border-top: 1px solid #1a1a1a;
   width: 220px;
   margin-bottom: 6px;
 }
-.letter-page .rx-signoff .doctor-name { font-weight: 700; font-size: 12pt; }
-.letter-page .rx-signoff .doctor-meta { font-size: 10.5pt; line-height: 1.5; color: #1a1a1a; }
+.letter-page .rx-signoff .doctor-name {
+  font-weight: 700;
+  font-size: 12pt;
+  break-after: avoid;
+  page-break-after: avoid;
+}
+.letter-page .rx-signoff .doctor-meta {
+  font-size: 10.5pt;
+  line-height: 1.5;
+  color: #1a1a1a;
+  break-before: avoid;
+  break-inside: avoid;
+  page-break-before: avoid;
+  page-break-inside: avoid;
+}
 
 /* ---------- Continuing-care section headings ---------- */
 .letter-page h3.cc-section {
@@ -895,6 +930,10 @@ body.generator.is-ready .generator-shell {
     min-height: 297mm;
     margin: 0;
     padding: 18mm 20mm 20mm;
+  }
+  .letter-page[contenteditable="true"],
+  .letter-page[contenteditable="true"]:focus {
+    outline: none;
   }
   /* Suppress logo/heading for hospital letterhead printing */
   .letter-page.on-letterhead .letter-logo,

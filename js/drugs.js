@@ -121,6 +121,25 @@ window.DRUGS = [
     monitoring: 'Pre-cycle CBC, LFT, RFT, TFT and blood glucose. Surveillance for irAEs and infusion-related reactions, particularly during the first cycle.'
   },
   {
+    id: 'phesgo',
+    generic: 'Pertuzumab + Trastuzumab',
+    brands: ['Phesgo'],
+    class: 'HER2-directed fixed-dose subcutaneous combination',
+    standardDoses: [
+      'Loading dose (1200mg + 600mg)',
+      'Maintenance dose (600mg + 600mg)'
+    ],
+    defaultDose: 'Loading dose (1200mg + 600mg)',
+    infusionTime: 'Subcutaneous injection in the thigh: approximately 8 minutes for initial dose; approximately 5 minutes for maintenance dose.',
+    premedication: 'No routine premedication specified. Keep emergency medicines and equipment available for hypersensitivity or administration-related reactions.',
+    storage: 'Refrigerate at 2–8°C in the original carton. Do not freeze. Do not shake. Protect from light.',
+    indications: [
+      'HER2-positive early breast cancer as part of neoadjuvant / adjuvant therapy where pertuzumab + trastuzumab is indicated',
+      'HER2-positive metastatic breast cancer in combination with chemotherapy where pertuzumab + trastuzumab is indicated'
+    ],
+    monitoring: 'Confirm HER2-positive status before treatment. Assess baseline and periodic LVEF as per protocol; monitor for administration-related reactions, hypersensitivity, cardiomyopathy and chemotherapy-related toxicity when used in combination.'
+  },
+  {
     id: 'osimertinib',
     generic: 'Osimertinib',
     brands: ['Tagrisso'],
