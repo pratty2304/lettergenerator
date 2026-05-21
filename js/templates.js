@@ -39,7 +39,7 @@
   function signoff(doc) {
     return `<div class="signoff">
       <p>Regards,</p>
-      <div class="sig-space"></div>
+      ${editableSpace('sig-space', 3)}
       <div class="doctor-name">${doc.name}</div>
       <div class="doctor-meta">
         ${doc.qualifications}<br/>
@@ -48,6 +48,14 @@
         KMC No: ${doc.kmc}
       </div>
     </div>`;
+  }
+
+  function editableSpace(className, lines) {
+    return `<div class="${className} editable-space" contenteditable="true" spellcheck="false">${'<br/>'.repeat(lines)}</div>`;
+  }
+
+  function editableRule(className) {
+    return `<div class="${className} editable-rule" contenteditable="true" spellcheck="false">&nbsp;</div>`;
   }
 
   function heading(title) {
@@ -317,7 +325,7 @@
           ${d.umrNo ? `<div class="rx-row"><span>UMR No:</span><span>${esc(d.umrNo)}</span></div>` : ''}
         </div>
 
-        <hr class="rx-divider" />
+        ${editableRule('rx-divider')}
 
         <p class="rx-summary">
           <strong>${esc(fullName)}</strong> is a ${esc(d.age)} year old ${sexWord} diagnosed with
@@ -332,10 +340,10 @@
         <div class="rx-drug-line">${esc(prescriptionPrefix)} ${esc(generic.toUpperCase())} ( ${esc(brand)} ) ${doseMg && vialBreak ? doseMg + ' mg' : esc(dose)}</div>
         ${vialBreak ? `<div class="rx-vial-line">( ${vialBreak} )</div>` : ''}
 
-        <div class="rx-spacer"></div>
+        ${editableSpace('rx-spacer', 5)}
 
         <div class="rx-signoff">
-          <div class="rx-sig-line"></div>
+          ${editableRule('rx-sig-line')}
           <div class="doctor-name">${doc.name}</div>
           <div class="doctor-meta">
             ${doc.qualifications}<br/>
@@ -1147,8 +1155,8 @@
           ${signoff(doc)}
           <div class="attender-signoff">
             <p>Attender / Family Member Signature</p>
-            <div class="sig-space"></div>
-            <div class="attender-line"></div>
+            ${editableSpace('sig-space', 3)}
+            ${editableRule('attender-line')}
             <div class="attender-meta">
               Name: ${esc(d.attenderName)}<br/>
               Relationship: ${esc(d.relationship)}

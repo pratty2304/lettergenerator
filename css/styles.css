@@ -264,6 +264,65 @@ body.generator.is-ready .generator-shell {
   color: var(--ink-soft);
 }
 .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn.danger:hover { border-color: #c85b5b; color: #b33a3a; }
+.btn:disabled,
+.btn:disabled:hover {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.archive-box {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.archive-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.archive-head h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.archive-head span {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+#savedLetterSelect {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fafbfd;
+}
+.archive-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.archive-actions .btn {
+  flex: 1;
+  padding: 7px 12px;
+  font-size: 12.5px;
+}
+.archive-status {
+  min-height: 18px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
 
 .hint {
   font-size: 12px;
@@ -362,7 +421,25 @@ body.generator.is-ready .generator-shell {
   break-after: avoid;
   page-break-after: avoid;
 }
-.letter-page .signoff .sig-space { height: 50px; }
+.letter-page .editable-space,
+.letter-page .editable-rule {
+  cursor: text;
+  white-space: pre-wrap;
+  user-select: text;
+}
+.letter-page .editable-space {
+  min-height: 1em;
+  line-height: 1.55;
+}
+.letter-page .editable-rule {
+  min-height: 0.9em;
+  line-height: 0.9;
+}
+.letter-page .editable-space:focus,
+.letter-page .editable-rule:focus {
+  outline: 1px dashed var(--accent);
+  outline-offset: 2px;
+}
 .letter-page .signoff .doctor-name {
   font-weight: 700;
   font-family: var(--font-sans);
@@ -405,7 +482,7 @@ body.generator.is-ready .generator-shell {
   font-weight: 600;
 }
 .letter-page .attender-signoff .sig-space {
-  height: 50px;
+  min-height: 1em;
 }
 .letter-page .attender-signoff .attender-line {
   border-top: 1px solid #1a1a1a;
@@ -504,7 +581,7 @@ body.generator.is-ready .generator-shell {
   text-align: center;
   margin: 0 0 10px;
 }
-.letter-page .rx-spacer { height: 80px; }
+.letter-page .rx-spacer { line-height: 1.55; }
 .letter-page .rx-signoff {
   font-family: var(--font-sans);
   margin-top: 30px;
@@ -801,11 +878,11 @@ body.generator.is-ready .generator-shell {
     overflow-wrap: anywhere;
   }
   .letter-page .rx-vial-line { font-size: 13px; overflow-wrap: anywhere; }
-  .letter-page .rx-spacer { height: 50px; }
+  .letter-page .rx-spacer { line-height: 1.5; }
 
   /* Signoff */
   .letter-page .signoff { margin-top: 24px; }
-  .letter-page .signoff .sig-space { height: 36px; }
+  .letter-page .signoff .sig-space { min-height: 1em; }
   .letter-page .signoff .doctor-name { font-size: 14px; }
   .letter-page .signoff .doctor-meta { font-size: 12.5px; }
   .letter-page .dual-signoff {
@@ -813,7 +890,7 @@ body.generator.is-ready .generator-shell {
     gap: 24px;
     margin-top: 24px;
   }
-  .letter-page .attender-signoff .sig-space { height: 36px; }
+  .letter-page .attender-signoff .sig-space { min-height: 1em; }
 
   /* Form fields — stack drug-list to 1 column for narrow phones */
   .drug-list-row {
@@ -933,6 +1010,10 @@ body.generator.is-ready .generator-shell {
   }
   .letter-page[contenteditable="true"],
   .letter-page[contenteditable="true"]:focus {
+    outline: none;
+  }
+  .letter-page .editable-space:focus,
+  .letter-page .editable-rule:focus {
     outline: none;
   }
   /* Suppress logo/heading for hospital letterhead printing */

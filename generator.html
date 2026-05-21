@@ -20,11 +20,26 @@
   <main class="generator-shell" aria-busy="true">
     <aside class="form-panel no-print">
       <h2 class="panel-title">Letter details</h2>
-      <form id="letterForm" autocomplete="off"></form>
+      <form id="letterForm" autocomplete="on"></form>
       <div class="actions">
         <button type="button" id="generateBtn" class="btn primary">Generate</button>
+        <button type="button" id="saveBtn" class="btn ghost">Save</button>
         <button type="button" id="printBtn" class="btn ghost">Print / Save PDF</button>
         <button type="button" id="resetBtn" class="btn ghost">Reset</button>
+      </div>
+      <div class="archive-box">
+        <div class="archive-head">
+          <h3>Saved letters</h3>
+          <span id="savedCount">0 / 50</span>
+        </div>
+        <select id="savedLetterSelect" aria-label="Saved letters">
+          <option value="">No saved letters</option>
+        </select>
+        <div class="archive-actions">
+          <button type="button" id="loadSavedBtn" class="btn ghost">Load</button>
+          <button type="button" id="deleteSavedBtn" class="btn ghost danger">Delete</button>
+        </div>
+        <p class="archive-status" id="archiveStatus"></p>
       </div>
       <p class="hint">The draft can be edited directly while entering details. Generate rebuilds the letter from the form.</p>
     </aside>
