@@ -1,5 +1,5 @@
 /* ========================================================================
-   Letter templates for KIMS MACS Letter Generator
+   Letter templates for KIMS Renova Letter Generator
    Each template:
      - meta: title shown in header, fields rendered in form
      - render(data): returns HTML string for the letter body (excluding logo
@@ -143,7 +143,7 @@
         <p class="salutation">To Whomsoever It May Concern,</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>This is to certify that the above-named patient was evaluated at the Department of Medical Oncology, KIMS MACS Onco Sciences, Bengaluru on <strong>${formatDate(d.visitDate)}</strong>.</p>
+          <p>This is to certify that the above-named patient was evaluated at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru on <strong>${formatDate(d.visitDate)}</strong>.</p>
           <p>${pronoun(d.sex, 'subjC')} is presently under our care with a diagnosis of <strong>${esc(d.diagnosis)}</strong>, and is undergoing oncological evaluation and management as appropriate.</p>
           <p><strong>Current treatment:</strong> ${esc(d.treatmentDetails)}. The treatment is being administered under medical supervision at our oncology day-care, with periodic clinical review and laboratory monitoring as per protocol.</p>
           <p>Based on today’s clinical assessment, it is opined that <strong>${opinion.toLowerCase()}</strong>.${resumeBit}</p>
@@ -191,7 +191,7 @@
         <p class="salutation">To Whomsoever It May Concern,</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>This is to certify that the above-named patient is currently under the care of the Department of Medical Oncology at KIMS MACS Onco Sciences, Bengaluru, for management of the diagnosis stated above.</p>
+          <p>This is to certify that the above-named patient is currently under the care of the Department of Medical Oncology at KIMS Renova Oncology Institute, Bengaluru, for management of the diagnosis stated above.</p>
           <p><strong>Current treatment status:</strong> ${esc(d.treatmentPhase)}.</p>
           <p>${rationale}</p>
           <p>In view of the ongoing oncological treatment and the anticipated treatment-related side effects, the patient requires medical leave from work / academic duties for a period of <strong>${days} day(s)</strong>, from ${fromTo} (both days inclusive). During this period, complete physical rest, adequate hydration, balanced nutrition and avoidance of crowded public spaces are strongly recommended in order to minimise the risk of intercurrent infection and to allow recovery of haematological and constitutional reserves before the next planned intervention.</p>
@@ -262,7 +262,7 @@
         <p class="salutation">Respected ${esc(d.referredTo)},</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>I am referring the above-mentioned patient, who is presently under our care at the Department of Medical Oncology, KIMS MACS Onco Sciences, Bengaluru, for your kind opinion and further management.</p>
+          <p>I am referring the above-mentioned patient, who is presently under our care at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru, for your kind opinion and further management.</p>
           <p><strong>Reason for referral:</strong> ${esc(d.reasonForReferral)}.</p>
           <p><strong>Current oncological status / treatment:</strong> ${esc(d.currentTreatment)}.</p>
           ${d.specificQuestion ? `<p><strong>Specific question:</strong> ${esc(d.specificQuestion)}</p>` : ''}
@@ -401,7 +401,7 @@
         <p class="salutation">To,<br/>The Medical Officer,<br/>${esc(d.insurer)}${d.policyNo ? `<br/>Policy / Claim No: ${esc(d.policyNo)}` : ''}</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>This letter is being written to support the pre-authorisation request for the above-named patient, who is currently under the care of the Department of Medical Oncology at KIMS MACS Onco Sciences, Bengaluru.</p>
+          <p>This letter is being written to support the pre-authorisation request for the above-named patient, who is currently under the care of the Department of Medical Oncology at KIMS Renova Oncology Institute, Bengaluru.</p>
           ${d.stage ? `<p><strong>Disease characterisation:</strong> ${esc(d.stage)}.</p>` : ''}
           <p><strong>Planned treatment:</strong> ${esc(d.plannedTreatment)}.</p>
           <p><strong>Clinical justification:</strong> The proposed regimen represents the current standard of care for the patient’s disease setting, supported by international and national clinical practice guidelines as well as level-1 randomised evidence demonstrating meaningful improvements in disease-control and survival outcomes when compared with alternative treatment strategies. Selection of this regimen has been individualised after considering the patient’s histopathology, molecular profile, prior therapy, performance status, comorbidities and informed preference.</p>
@@ -472,7 +472,7 @@
         <p class="salutation">To Whomsoever It May Concern,</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>This is to certify that the above-named patient, currently under the care of the Department of Medical Oncology at KIMS MACS Onco Sciences, Bengaluru, has been clinically assessed and is medically fit to undertake <strong>${esc(d.travelMode)}</strong>${d.travelFrom && d.travelTo ? ` from <strong>${esc(d.travelFrom)}</strong> to <strong>${esc(d.travelTo)}</strong>` : ''}${d.travelDate ? ` on <strong>${formatDate(d.travelDate)}</strong>` : ''}.</p>
+          <p>This is to certify that the above-named patient, currently under the care of the Department of Medical Oncology at KIMS Renova Oncology Institute, Bengaluru, has been clinically assessed and is medically fit to undertake <strong>${esc(d.travelMode)}</strong>${d.travelFrom && d.travelTo ? ` from <strong>${esc(d.travelFrom)}</strong> to <strong>${esc(d.travelTo)}</strong>` : ''}${d.travelDate ? ` on <strong>${formatDate(d.travelDate)}</strong>` : ''}.</p>
           <p>At the time of assessment ${pronoun(d.sex, 'subj')} was haemodynamically stable, with adequate cardiopulmonary reserve and no active uncontrolled symptoms or infection that would contraindicate travel. ${pronoun(d.sex, 'possC')} general condition and performance status are considered adequate for the journey planned.</p>
           ${d.specialNeeds ? `<p><strong>Special requirements during travel:</strong> ${esc(d.specialNeeds)}. The relevant carrier is requested to extend appropriate assistance.</p>` : ''}
           <p>It is advisable that the patient carries ${pronoun(d.sex, 'poss')} medical records, current prescriptions and a contact number of the treating team, and avoids strenuous physical exertion, dehydration and exposure to crowded environments during transit. In the unlikely event of a medical concern during travel, ${pronoun(d.sex, 'subj')} is advised to seek the nearest medical facility without delay.</p>
@@ -505,7 +505,7 @@
         <p class="salutation">To Whomsoever It May Concern,</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>This is to formally document that the above-named patient has completed the planned course of oncological treatment under our care at KIMS MACS Onco Sciences, Bengaluru.</p>
+          <p>This is to formally document that the above-named patient has completed the planned course of oncological treatment under our care at KIMS Renova Oncology Institute, Bengaluru.</p>
           <p><strong>Treatment received:</strong> ${esc(d.treatmentReceived)}.</p>
           ${d.completionDate ? `<p><strong>Date of completion of active therapy:</strong> ${formatDate(d.completionDate)}.</p>` : ''}
           ${d.currentStatus ? `<p><strong>Current disease status:</strong> ${esc(d.currentStatus)}.</p>` : ''}
@@ -570,7 +570,7 @@
         <p class="salutation">To Whomsoever It May Concern,</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>The above-named patient was reviewed at the Department of Medical Oncology, KIMS MACS Onco Sciences, Bengaluru, for a documented second opinion regarding the diagnosis and proposed management.</p>
+          <p>The above-named patient was reviewed at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru, for a documented second opinion regarding the diagnosis and proposed management.</p>
           ${d.referringDoctor ? `<p><strong>Primary treating team:</strong> ${esc(d.referringDoctor)}.</p>` : ''}
           ${d.recordsReviewed ? `<p><strong>Records reviewed:</strong> ${esc(d.recordsReviewed)}.</p>` : ''}
           ${d.currentPlan ? `<p><strong>Existing treatment plan:</strong> ${esc(d.currentPlan)}.</p>` : ''}
@@ -754,7 +754,7 @@
         ${patientBlock(d)}
         ${d.nationality ? `<p style="font-family:var(--font-sans); font-size:11pt; margin-top:-8px;"><strong>Country / city of residence:</strong> ${esc(d.nationality)}</p>` : ''}
         <div class="body">
-          <p>The above-named patient has been under our care at the Department of Medical Oncology, KIMS MACS Onco Sciences, Bengaluru. As ${pronoun(d.sex,'subj')} now wishes to continue further oncological treatment closer to ${pronoun(d.sex,'poss')} home, this letter is being issued to provide a structured handover of the diagnosis, treatment received so far and the recommended ongoing plan, so that the receiving treating physician may continue care seamlessly.</p>
+          <p>The above-named patient has been under our care at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru. As ${pronoun(d.sex,'subj')} now wishes to continue further oncological treatment closer to ${pronoun(d.sex,'poss')} home, this letter is being issued to provide a structured handover of the diagnosis, treatment received so far and the recommended ongoing plan, so that the receiving treating physician may continue care seamlessly.</p>
 
           ${d.stageMolecular ? sectionsBlock('Disease characterisation', `<p>${esc(d.stageMolecular)}</p>`) : ''}
 
@@ -914,7 +914,7 @@
         <p class="salutation">To,<br/>${addressee},</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>The above-named patient is currently under our care at the Department of Medical Oncology, KIMS MACS Onco Sciences, Bengaluru.</p>
+          <p>The above-named patient is currently under our care at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru.</p>
           <p>I would be grateful if you could kindly <strong>issue the histopathology slides and paraffin-embedded tissue blocks</strong> pertaining to this patient${d.biopsyRef ? ` (<strong>${esc(d.biopsyRef)}</strong>)` : ''}.</p>
           ${purposeLine}
           ${d.extraNotes ? `<p><strong>Additional notes:</strong> ${esc(d.extraNotes)}</p>` : ''}
@@ -1061,7 +1061,7 @@
         <p class="salutation">To,<br/>${addressee},</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>The above-named patient is currently under our care at the Department of Medical Oncology, KIMS MACS Onco Sciences, Bengaluru.</p>
+          <p>The above-named patient is currently under our care at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru.</p>
           <p>Kindly process the sample submitted herewith for <strong>${esc(test)}</strong>${d.specimenType ? ` on the provided <strong>${esc(d.specimenType)}</strong>` : ''}${d.specimenRef ? ` (<strong>${esc(d.specimenRef)}</strong>)` : ''}.</p>
           ${testDetails}
           <p>${indicationLine}</p>

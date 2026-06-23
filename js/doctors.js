@@ -1,11 +1,11 @@
-// Consultant directory — KIMS MACS Onco Sciences
+// Consultant directory — KIMS Renova Oncology Institute
 window.DOCTORS = [
   {
     id: 'suresh',
     name: 'Dr. Suresh Babu MC',
     qualifications: 'MBBS, MD, DM',
     designation: 'Consultant Medical Oncologist',
-    institute: 'KIMS Hospitals, Bengaluru',
+    institute: 'KIMS Renova Oncology Institute, Bengaluru',
     kmc: '60989'
   },
   {
@@ -13,7 +13,7 @@ window.DOCTORS = [
     name: 'Dr. Prathyusha Eaga',
     qualifications: 'MBBS, MD, DM',
     designation: 'Consultant Medical Oncologist',
-    institute: 'KIMS Hospitals, Bengaluru',
+    institute: 'KIMS Renova Oncology Institute, Bengaluru',
     kmc: '158021'
   },
   {
@@ -21,7 +21,7 @@ window.DOCTORS = [
     name: 'Dr. Vivek B Maleyur',
     qualifications: 'MBBS, MD, DM',
     designation: 'Consultant Medical Oncologist',
-    institute: 'KIMS Hospitals, Bengaluru',
+    institute: 'KIMS Renova Oncology Institute, Bengaluru',
     kmc: '128134'
   },
   {
@@ -29,7 +29,7 @@ window.DOCTORS = [
     name: 'Dr. Chetan V',
     qualifications: 'MBBS, MD, DNB, DM',
     designation: 'Consultant Medical Oncologist',
-    institute: 'KIMS Hospitals, Bengaluru',
+    institute: 'KIMS Renova Oncology Institute, Bengaluru',
     kmc: '118210'
   }
 ];

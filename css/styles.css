@@ -1,5 +1,5 @@
 /* ============================================================
-   KIMS MACS Letter Generator — pastel, minimal, print-friendly
+   KIMS Renova Letter Generator — pastel, minimal, print-friendly
    ============================================================ */
 
 :root {
@@ -365,7 +365,7 @@ body.generator.is-ready .generator-shell {
 }
 
 .letter-page .letter-logo {
-  max-height: 97px;
+  max-height: 78px;
   margin-bottom: 16px;
 }
 .letter-page h1.letter-heading {
@@ -1008,6 +1008,9 @@ body.generator.is-ready .generator-shell {
     margin: 0;
     padding: 18mm 20mm 20mm;
   }
+  .letter-page .letter-logo {
+    max-height: 78px;
+  }
   .letter-page[contenteditable="true"],
   .letter-page[contenteditable="true"]:focus {
     outline: none;
@@ -1054,6 +1057,6 @@ body.generator.is-ready .generator-shell {
   .letter-page h1.rx-title              { color: #000 !important; text-decoration: underline !important; }
   .letter-page .rx-divider              { border-top: 1px solid #000 !important; }
   .letter-page .rx-signoff .rx-sig-line { border-top: 1px solid #000 !important; }
-  /* Convert the KIMS logo to greyscale */
+  /* Convert the letter logo to greyscale */
   .letter-page .letter-logo             { filter: grayscale(100%) !important; }
 }

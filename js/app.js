@@ -38,7 +38,7 @@
   }
 
   titleEl.textContent = tmpl.title;
-  document.title = tmpl.title + ' — KIMS MACS';
+  document.title = tmpl.title + ' — KIMS Renova';
 
   // ---------- Build form ----------
   buildForm(tmpl.fields);
@@ -952,7 +952,7 @@
     }
 
     const html = `
-      <img src="assets/kims-logo.png" alt="KIMS MACS Onco Sciences" class="letter-logo" />
+      <img src="assets/kims-renova-logo.png" alt="KIMS Renova Oncology Institute" class="letter-logo" />
       ${body}
     `;
     previewEl.innerHTML = html;
@@ -1013,7 +1013,7 @@
       name: '[Signing consultant]',
       qualifications: '[Qualifications]',
       designation: '[Designation]',
-      institute: 'KIMS Hospitals, Bengaluru',
+      institute: 'KIMS Renova Oncology Institute, Bengaluru',
       kmc: '[KMC No]'
     };
   }
