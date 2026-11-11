@@ -378,28 +378,44 @@ window.DRUGS = [
     monitoring: 'CBC before each dose; baseline and periodic LVEF; vigilant monitoring for ILD / pneumonitis (consider baseline and periodic CT chest).'
   },
   {
-    id: 'bevacizumab',
-    generic: 'Bevacizumab',
-    brands: ['Avastin', 'Bevatas', 'Krabeva'],
-    class: 'Anti-VEGF monoclonal antibody',
-    vialSizes: [400, 100],
+    id: 'pertuzumab',
+    generic: 'Pertuzumab',
+    brands: ['Sigrima', 'Perjeta'],
+    class: 'Anti-HER2 monoclonal antibody (HER2 dimerisation inhibitor)',
+    vialSizes: [420],
     standardDoses: [
-      '5 mg/kg IV every 2 weeks',
-      '10 mg/kg IV every 2 weeks',
-      '7.5 mg/kg IV every 3 weeks',
-      '15 mg/kg IV every 3 weeks'
+      '840 mg IV loading dose, then 420 mg every 3 weeks',
+      '420 mg IV every 3 weeks (maintenance)'
     ],
-    defaultDose: '15 mg/kg IV every 3 weeks',
-    infusionTime: 'First infusion over 90 minutes, second over 60 minutes, subsequent over 30 minutes if tolerated.',
+    defaultDose: '840 mg IV loading dose, then 420 mg every 3 weeks',
+    infusionTime: 'Loading dose over 60 minutes; maintenance doses over 30–60 minutes.',
+    premedication: 'No routine premedication. Paracetamol / antihistamine for infusion reactions as required.',
+    storage: 'Refrigerate at 2–8°C. Do not freeze. Protect from light.',
+    indications: [
+      'HER2-positive early breast cancer (neoadjuvant / adjuvant) with trastuzumab and chemotherapy',
+      'HER2-positive metastatic breast cancer with trastuzumab and docetaxel'
+    ],
+    monitoring: 'Baseline and 3-monthly LVEF (ECHO / MUGA); monitor for diarrhoea, infusion reactions and cardiac dysfunction.'
+  },
+  {
+    id: 'toripalimab',
+    generic: 'Toripalimab',
+    brands: ['Zytorvi'],
+    class: 'Anti–PD-1 monoclonal antibody',
+    vialSizes: [240],
+    standardDoses: [
+      '240 mg IV every 3 weeks',
+      '3 mg/kg IV every 2 weeks'
+    ],
+    defaultDose: '240 mg IV every 3 weeks',
+    infusionTime: 'First infusion over 60 minutes; subsequent infusions over 30 minutes if tolerated.',
     premedication: 'No routine premedication required.',
     storage: 'Refrigerate at 2–8°C. Do not freeze or shake. Protect from light.',
     indications: [
-      'Metastatic colorectal carcinoma',
-      'Non-squamous NSCLC',
-      'Ovarian, fallopian tube and primary peritoneal carcinoma',
-      'Cervical carcinoma, glioblastoma, and hepatocellular carcinoma with atezolizumab'
+      'Recurrent / metastatic nasopharyngeal carcinoma with gemcitabine–cisplatin (JUPITER-02)',
+      'Oesophageal squamous cell carcinoma with chemotherapy (JUPITER-06)'
     ],
-    monitoring: 'Blood pressure and urine protein before each dose; monitor for bleeding, wound-healing complications, GI perforation and thromboembolism. Withhold around surgery.'
+    monitoring: 'Baseline and pre-cycle CBC, LFT, RFT, TFT, cortisol, blood glucose; surveillance for immune-related adverse events.'
   },
   {
     id: 'cemiplimab',
