@@ -68,6 +68,18 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  // User text followed by a full stop, without doubling one the user already typed
+  function stop(s) {
+    const t = esc(s).replace(/[\s.]+$/, '');
+    return /[!?]$/.test(t) ? t : t + '.';
+  }
+
+  // Lower-case only the first letter (keeps abbreviations such as IHC / NGS intact)
+  function lcFirst(s) {
+    const t = String(s || '');
+    return t.charAt(0).toLowerCase() + t.slice(1);
+  }
+
   function formatDate(iso) {
     if (!iso) return '';
     const parts = parseIsoDate(iso);
@@ -98,8 +110,8 @@
       if (kind === 'possC') return 'Her';
     }
     if (sex === 'Other') {
-      if (kind === 'subj') return 'they';
-      if (kind === 'subjC') return 'They';
+      if (kind === 'subj') return 'the patient';
+      if (kind === 'subjC') return 'The patient';
       if (kind === 'obj') return 'them';
       if (kind === 'poss') return 'their';
       if (kind === 'possC') return 'Their';
@@ -125,7 +137,7 @@
       { name: 'fitnessOpinion', label: 'Fitness opinion',
         type: 'select', required: true,
         options: [
-          'Fit to resume duties from the date mentioned below',
+          'Fit to resume duties',
           'Currently unfit for duty / school due to ongoing treatment',
           'Fit for sedentary / light duties only'
         ] },
@@ -145,8 +157,8 @@
         <div class="body">
           <p>This is to certify that the above-named patient was evaluated at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru on <strong>${formatDate(d.visitDate)}</strong>.</p>
           <p>${pronoun(d.sex, 'subjC')} is presently under our care with a diagnosis of <strong>${esc(d.diagnosis)}</strong>, and is undergoing oncological evaluation and management as appropriate.</p>
-          <p><strong>Current treatment:</strong> ${esc(d.treatmentDetails)}. The treatment is being administered under medical supervision at our oncology day-care, with periodic clinical review and laboratory monitoring as per protocol.</p>
-          <p>Based on today’s clinical assessment, it is opined that <strong>${opinion.toLowerCase()}</strong>.${resumeBit}</p>
+          <p><strong>Current treatment:</strong> ${stop(d.treatmentDetails)} The treatment is being administered under medical supervision at our oncology day care, with periodic clinical review and laboratory monitoring as per protocol.</p>
+          <p>Based on today’s clinical assessment, it is my opinion that the patient is <strong>${esc(lcFirst(opinion))}</strong>.${resumeBit}</p>
           <p>This certificate is issued on the patient’s request for record and official purposes.</p>
         </div>
         ${signoff(doc)}`;
@@ -178,11 +190,15 @@
       { name: 'extraNotes', label: 'Additional clinical notes (optional)', type: 'textarea' },
       F.letterDate, F.consultant
     ],
+    validate(d) {
+      if (d.leaveFromDate && d.leaveToDate && d.leaveToDate < d.leaveFromDate) {
+        return '"Leave until" date is before the "Leave from" date.';
+      }
+      return '';
+    },
     render(d, doc) {
       const fromTo = `<strong>${formatDate(d.leaveFromDate)}</strong> to <strong>${formatDate(d.leaveToDate)}</strong>`;
       const days = daysBetween(d.leaveFromDate, d.leaveToDate);
-      const reason = (d.leaveReason || '').toLowerCase();
-
       const rationale = leaveRationale(d.leaveReason, d.sex);
 
       return `
@@ -192,9 +208,9 @@
         ${patientBlock(d)}
         <div class="body">
           <p>This is to certify that the above-named patient is currently under the care of the Department of Medical Oncology at KIMS Renova Oncology Institute, Bengaluru, for management of the diagnosis stated above.</p>
-          <p><strong>Current treatment status:</strong> ${esc(d.treatmentPhase)}.</p>
+          <p><strong>Current treatment status:</strong> ${stop(d.treatmentPhase)}</p>
           <p>${rationale}</p>
-          <p>In view of the ongoing oncological treatment and the anticipated treatment-related side effects, the patient requires medical leave from work / academic duties for a period of <strong>${days} day(s)</strong>, from ${fromTo} (both days inclusive). During this period, complete physical rest, adequate hydration, balanced nutrition and avoidance of crowded public spaces are strongly recommended in order to minimise the risk of intercurrent infection and to allow recovery of haematological and constitutional reserves before the next planned intervention.</p>
+          <p>In view of the ongoing oncological treatment and the anticipated treatment-related side effects, the patient requires medical leave from work / academic duties for a period of <strong>${days} day${days === 1 ? '' : 's'}</strong>, from ${fromTo} (both days inclusive). During this period, complete physical rest, adequate hydration, balanced nutrition and avoidance of crowded public spaces are strongly recommended in order to minimise the risk of intercurrent infection and to allow recovery of haematological and constitutional reserves before the next planned intervention.</p>
           ${d.extraNotes ? `<p><strong>Additional notes:</strong> ${esc(d.extraNotes)}</p>` : ''}
           <p>The patient will continue to be reviewed in our outpatient clinic at scheduled intervals. Kindly grant the requested leave on medical grounds and extend the necessary cooperation.</p>
         </div>
@@ -263,10 +279,10 @@
         ${patientBlock(d)}
         <div class="body">
           <p>I am referring the above-mentioned patient, who is presently under our care at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru, for your kind opinion and further management.</p>
-          <p><strong>Reason for referral:</strong> ${esc(d.reasonForReferral)}.</p>
-          <p><strong>Current oncological status / treatment:</strong> ${esc(d.currentTreatment)}.</p>
+          <p><strong>Reason for referral:</strong> ${stop(d.reasonForReferral)}</p>
+          <p><strong>Current oncological status / treatment:</strong> ${stop(d.currentTreatment)}</p>
           ${d.specificQuestion ? `<p><strong>Specific question:</strong> ${esc(d.specificQuestion)}</p>` : ''}
-          <p>I would be grateful if you could review the patient at the earliest convenience and share your assessment, recommendations and any specific instructions regarding ongoing or planned oncological treatment. Relevant prior investigations and treatment records are being shared with the patient for your reference.</p>
+          <p>I would be grateful if you could review the patient at your earliest convenience and share your assessment, recommendations and any specific instructions regarding ongoing or planned oncological treatment. Relevant prior investigations and treatment records are being sent with the patient for your reference.</p>
           <p>Thank you for accommodating this referral. I remain available for any clinical clarification that may be required.</p>
         </div>
         ${signoff(doc)}`;
@@ -286,18 +302,29 @@
       { name: 'drugId', label: 'Drug', type: 'drug', required: true },
       { name: 'brand', label: 'Brand', type: 'brand', required: true },
       { name: 'dose', label: 'Dose & schedule', type: 'doseSelect', required: true },
-      { name: 'cyclesPlanned', label: 'Number of cycles', type: 'number', required: true,
+      { name: 'customDose', label: 'Type dose & schedule', type: 'text',
+        placeholder: 'e.g. 300 mg IV every 3 weeks' },
+      { name: 'weightKg', label: 'Body weight (kg) — calculates mg/kg doses', type: 'number',
+        placeholder: 'e.g. 62' },
+      { name: 'cyclesPlanned', label: 'Number of cycles (Pembrolizumab)', type: 'number',
         placeholder: 'e.g. 3' },
       { name: 'regimen', label: 'Backbone regimen / accompanying drugs (optional)', type: 'text',
         placeholder: 'e.g. Carboplatin + Paclitaxel' },
       F.letterDate, F.consultant
     ],
+    validate(d) {
+      if (d.dose === CUSTOM_DOSE && !String(d.customDose || '').trim()) return 'Please type the dose & schedule.';
+      if (d.drugId === 'pembrolizumab' && !d.cyclesPlanned) return 'Please enter the number of cycles for Pembrolizumab.';
+      return '';
+    },
     render(d, doc) {
       const drug = (window.DRUGS || []).find(x => x.id === d.drugId);
       const generic = drug ? drug.generic : (d.drugId || '[Drug]');
       const brand = drug ? (d.brand || drug.brands[0]) : (d.brand || '[Brand]');
-      const dose = drug ? (d.dose || drug.defaultDose) : (d.dose || '[Dose & schedule]');
-      const doseMg = extractMg(dose);
+      const chosenDose = d.dose === CUSTOM_DOSE ? (d.customDose || '[Dose & schedule]') : d.dose;
+      const dose = drug ? (chosenDose || drug.defaultDose) : (chosenDose || '[Dose & schedule]');
+      const calc = weightBasedDose(dose, d.weightKg);
+      const doseMg = calc ? calc.mg : extractMg(dose);
       const vialBreak = doseMg && drug && drug.vialSizes ? splitIntoVials(doseMg, drug.vialSizes) : '';
       const prescriptionPrefix = drug && drug.prescriptionPrefix ? drug.prescriptionPrefix : 'Inj.';
 
@@ -306,7 +333,7 @@
       const fullName = (title ? title + ' ' : '') + (d.patientName || '');
       const isPembro = drug && drug.id === 'pembrolizumab';
       const cyclesLabel = (isPembro && d.cyclesPlanned)
-        ? `This prescription valid for ${esc(d.cyclesPlanned)} cycle${Number(d.cyclesPlanned) === 1 ? '' : 's'}`
+        ? `This prescription is valid for ${esc(d.cyclesPlanned)} cycle${Number(d.cyclesPlanned) === 1 ? '' : 's'}`
         : '';
 
       const regimenText = d.regimen
@@ -328,10 +355,10 @@
         ${editableRule('rx-divider')}
 
         <p class="rx-summary">
-          <strong>${esc(fullName)}</strong> is a ${esc(d.age)} year old ${sexWord} diagnosed with
+          <strong>${esc(fullName)}</strong> is a ${esc(d.age)}-year-old ${sexWord} diagnosed with
           <strong>${esc(d.diagnosisShort)}</strong>, planned for treatment with
-          <strong>${regimenText}</strong>. Prescription is for the stated number of cycles,
-          subject to clinical review, routine pre-treatment assessment, and institutional
+          <strong>${regimenText}</strong>. ${isPembro ? 'Prescription is for the stated number of cycles, subject' : 'Prescription is subject'}
+          to clinical review, routine pre-treatment assessment, and institutional
           administration protocols.
         </p>
 
@@ -339,6 +366,7 @@
 
         <div class="rx-drug-line">${esc(prescriptionPrefix)} ${esc(generic.toUpperCase())} ( ${esc(brand)} ) ${doseMg && vialBreak ? doseMg + ' mg' : esc(dose)}</div>
         ${vialBreak ? `<div class="rx-vial-line">( ${vialBreak} )</div>` : ''}
+        ${calc ? `<div class="rx-vial-line">${esc(calc.note)}</div>` : ''}
 
         ${editableSpace('rx-spacer', 5)}
 
@@ -358,20 +386,54 @@
   // Extract numeric mg from a dose string like "200 mg IV every 3 weeks" → 200
   function extractMg(s) {
     if (!s) return 0;
+    if (/mg\s*\//i.test(s)) return 0; // weight/BSA-based (mg/kg, mg/m²): print the dose as written
     const m = String(s).match(/(\d+(?:\.\d+)?)\s*mg/i);
     return m ? parseFloat(m[1]) : 0;
   }
 
-  // Greedy split of a total dose into available vial sizes (largest first)
+  const CUSTOM_DOSE = '__custom';
+
+  // "16 mg/kg ..." + weight 70 → { mg: 1120, note: '16 mg/kg × 70 kg' }; honours "(max 200 mg)"
+  function weightBasedDose(dose, weightKg) {
+    const w = parseFloat(weightKg);
+    const m = String(dose || '').match(/(\d+(?:\.\d+)?)\s*mg\s*\/\s*kg/i);
+    if (!m || !(w > 0)) return null;
+    const perKg = parseFloat(m[1]);
+    let mg = Math.round(perKg * w);
+    let note = `${perKg} mg/kg × ${w} kg`;
+    const cap = String(dose).match(/max\.?\s*(\d+(?:\.\d+)?)\s*mg/i);
+    if (cap && mg > parseFloat(cap[1])) {
+      mg = parseFloat(cap[1]);
+      note += ` (capped at ${mg} mg)`;
+    }
+    return { mg, note };
+  }
+
+  // Vials needed for a dose: covers the dose with the fewest vials while wasting
+  // less than one smallest vial; ties go to the least wastage.
   function splitIntoVials(totalMg, vialSizes) {
     if (!totalMg || !vialSizes || !vialSizes.length) return '';
     const sizes = [...vialSizes].sort((a, b) => b - a);
-    let remain = totalMg;
+    const smallest = sizes[sizes.length - 1];
+    let best = null;
+    (function search(i, counts, total) {
+      if (i === sizes.length) {
+        const waste = total - totalMg;
+        if (waste < 0 || waste >= smallest) return;
+        const n = counts.reduce((a, b) => a + b, 0);
+        if (!best || n < best.n || (n === best.n && waste < best.waste)) best = { n, waste, counts: [...counts] };
+        return;
+      }
+      const max = Math.ceil(totalMg / sizes[i]) + 1;
+      for (let c = 0; c <= max; c++) {
+        counts.push(c);
+        search(i + 1, counts, total + c * sizes[i]);
+        counts.pop();
+      }
+    })(0, [], 0);
+    if (!best) return '';
     const parts = [];
-    for (const s of sizes) {
-      while (remain >= s) { parts.push(s); remain -= s; }
-    }
-    if (remain > 0) parts.push(remain);
+    sizes.forEach((s, i) => { for (let k = 0; k < best.counts[i]; k++) parts.push(s); });
     return parts.join(' + ') + ' mg';
   }
 
@@ -402,11 +464,11 @@
         ${patientBlock(d)}
         <div class="body">
           <p>This letter is being written to support the pre-authorisation request for the above-named patient, who is currently under the care of the Department of Medical Oncology at KIMS Renova Oncology Institute, Bengaluru.</p>
-          ${d.stage ? `<p><strong>Disease characterisation:</strong> ${esc(d.stage)}.</p>` : ''}
-          <p><strong>Planned treatment:</strong> ${esc(d.plannedTreatment)}.</p>
+          ${d.stage ? `<p><strong>Disease characterisation:</strong> ${stop(d.stage)}</p>` : ''}
+          <p><strong>Planned treatment:</strong> ${stop(d.plannedTreatment)}</p>
           <p><strong>Clinical justification:</strong> The proposed regimen represents the current standard of care for the patient’s disease setting, supported by international and national clinical practice guidelines as well as level-1 randomised evidence demonstrating meaningful improvements in disease-control and survival outcomes when compared with alternative treatment strategies. Selection of this regimen has been individualised after considering the patient’s histopathology, molecular profile, prior therapy, performance status, comorbidities and informed preference.</p>
-          ${d.evidence ? `<p><strong>Supporting evidence:</strong> ${esc(d.evidence)}.</p>` : ''}
-          ${d.duration ? `<p><strong>Anticipated treatment duration:</strong> ${esc(d.duration)}.</p>` : ''}
+          ${d.evidence ? `<p><strong>Supporting evidence:</strong> ${stop(d.evidence)}</p>` : ''}
+          ${d.duration ? `<p><strong>Anticipated treatment duration:</strong> ${stop(d.duration)}</p>` : ''}
           <p>Withholding or delaying this treatment is likely to result in disease progression, deterioration of performance status and avoidable morbidity, and would deprive the patient of the most appropriate evidence-based intervention available for ${pronoun(d.sex,'poss')} clinical condition.</p>
           <p>I therefore request your kind office to approve cashless authorisation for the proposed treatment in keeping with the policy provisions. I remain available for any further clinical clarification or documentation that may be required.</p>
         </div>
@@ -438,8 +500,8 @@
         ${patientBlock(d)}
         <div class="body">
           <p>I am writing in response to the pre-authorisation denial issued in respect of the above-named patient. After careful review of the communication received, I respectfully request reconsideration of the decision on the following clinical grounds.</p>
-          <p><strong>Stated reason for denial:</strong> ${esc(d.denialReason)}.</p>
-          <p><strong>Treatment under appeal:</strong> ${esc(d.plannedTreatment)}.</p>
+          <p><strong>Stated reason for denial:</strong> ${stop(d.denialReason)}</p>
+          <p><strong>Treatment under appeal:</strong> ${stop(d.plannedTreatment)}</p>
           <p><strong>Clinical rationale supporting approval:</strong></p>
           <p>${esc(d.rebuttalPoints).replace(/\n+/g, '</p><p>')}</p>
           <p>The proposed therapy is neither experimental nor investigational. It is a regulator-approved (CDSCO / FDA / EMA) intervention, recognised by major national and international oncology guidelines (NCCN, ESMO, ICMR) as the standard of care for the patient’s disease setting, and is widely used in routine clinical practice across India. Denial of cover on the grounds cited would, in our considered medical opinion, deprive the patient of an essential and evidence-based treatment, with a real risk of disease progression and avoidable harm.</p>
@@ -457,7 +519,7 @@
     fields: [
       F.patientName, F.age, F.sex, F.mrn, F.diagnosis,
       { name: 'travelMode', label: 'Mode of travel', type: 'select',
-        options: ['Air travel (commercial)', 'Train', 'Road / private vehicle'], required: true },
+        options: ['Air travel (commercial flight)', 'Train travel', 'Road travel / private vehicle'], required: true },
       { name: 'travelFrom', label: 'Travel from', type: 'text' },
       { name: 'travelTo', label: 'Travel to', type: 'text' },
       { name: 'travelDate', label: 'Date of travel', type: 'date' },
@@ -472,9 +534,9 @@
         <p class="salutation">To Whomsoever It May Concern,</p>
         ${patientBlock(d)}
         <div class="body">
-          <p>This is to certify that the above-named patient, currently under the care of the Department of Medical Oncology at KIMS Renova Oncology Institute, Bengaluru, has been clinically assessed and is medically fit to undertake <strong>${esc(d.travelMode)}</strong>${d.travelFrom && d.travelTo ? ` from <strong>${esc(d.travelFrom)}</strong> to <strong>${esc(d.travelTo)}</strong>` : ''}${d.travelDate ? ` on <strong>${formatDate(d.travelDate)}</strong>` : ''}.</p>
+          <p>This is to certify that the above-named patient, currently under the care of the Department of Medical Oncology at KIMS Renova Oncology Institute, Bengaluru, has been clinically assessed and is medically fit to undertake <strong>${esc(lcFirst(d.travelMode))}</strong>${d.travelFrom && d.travelTo ? ` from <strong>${esc(d.travelFrom)}</strong> to <strong>${esc(d.travelTo)}</strong>` : ''}${d.travelDate ? ` on <strong>${formatDate(d.travelDate)}</strong>` : ''}.</p>
           <p>At the time of assessment ${pronoun(d.sex, 'subj')} was haemodynamically stable, with adequate cardiopulmonary reserve and no active uncontrolled symptoms or infection that would contraindicate travel. ${pronoun(d.sex, 'possC')} general condition and performance status are considered adequate for the journey planned.</p>
-          ${d.specialNeeds ? `<p><strong>Special requirements during travel:</strong> ${esc(d.specialNeeds)}. The relevant carrier is requested to extend appropriate assistance.</p>` : ''}
+          ${d.specialNeeds ? `<p><strong>Special requirements during travel:</strong> ${stop(d.specialNeeds)} The relevant carrier is requested to extend appropriate assistance.</p>` : ''}
           <p>It is advisable that the patient carries ${pronoun(d.sex, 'poss')} medical records, current prescriptions and a contact number of the treating team, and avoids strenuous physical exertion, dehydration and exposure to crowded environments during transit. In the unlikely event of a medical concern during travel, ${pronoun(d.sex, 'subj')} is advised to seek the nearest medical facility without delay.</p>
           <p>This certificate is issued upon the patient’s request.</p>
         </div>
@@ -506,9 +568,9 @@
         ${patientBlock(d)}
         <div class="body">
           <p>This is to formally document that the above-named patient has completed the planned course of oncological treatment under our care at KIMS Renova Oncology Institute, Bengaluru.</p>
-          <p><strong>Treatment received:</strong> ${esc(d.treatmentReceived)}.</p>
+          <p><strong>Treatment received:</strong> ${stop(d.treatmentReceived)}</p>
           ${d.completionDate ? `<p><strong>Date of completion of active therapy:</strong> ${formatDate(d.completionDate)}.</p>` : ''}
-          ${d.currentStatus ? `<p><strong>Current disease status:</strong> ${esc(d.currentStatus)}.</p>` : ''}
+          ${d.currentStatus ? `<p><strong>Current disease status:</strong> ${stop(d.currentStatus)}</p>` : ''}
           <p>${pronoun(d.sex, 'subjC')} has tolerated the treatment satisfactorily and is presently in a state of clinical stability. ${pronoun(d.sex, 'possC')} performance status is adequate to resume routine social, occupational and personal activities, while observing reasonable precautions appropriate to a cancer survivor.</p>
           ${d.followUpPlan ? `<p><strong>Recommended follow-up:</strong> ${esc(d.followUpPlan)}</p>` : ''}
           <p>The patient is advised to maintain a healthy lifestyle, balanced nutrition, age-appropriate physical activity, abstinence from tobacco and alcohol, and to report promptly should any new or unusual symptoms arise. Survivorship counselling regarding late effects, psychosocial wellbeing and screening for second primaries has also been provided.</p>
@@ -571,9 +633,9 @@
         ${patientBlock(d)}
         <div class="body">
           <p>The above-named patient was reviewed at the Department of Medical Oncology, KIMS Renova Oncology Institute, Bengaluru, for a documented second opinion regarding the diagnosis and proposed management.</p>
-          ${d.referringDoctor ? `<p><strong>Primary treating team:</strong> ${esc(d.referringDoctor)}.</p>` : ''}
-          ${d.recordsReviewed ? `<p><strong>Records reviewed:</strong> ${esc(d.recordsReviewed)}.</p>` : ''}
-          ${d.currentPlan ? `<p><strong>Existing treatment plan:</strong> ${esc(d.currentPlan)}.</p>` : ''}
+          ${d.referringDoctor ? `<p><strong>Primary treating team:</strong> ${stop(d.referringDoctor)}</p>` : ''}
+          ${d.recordsReviewed ? `<p><strong>Records reviewed:</strong> ${stop(d.recordsReviewed)}</p>` : ''}
+          ${d.currentPlan ? `<p><strong>Existing treatment plan:</strong> ${stop(d.currentPlan)}</p>` : ''}
           <p><strong>Opinion:</strong></p>
           <p>${esc(d.opinion).replace(/\n+/g, '</p><p>')}</p>
           <p>This opinion has been provided after a careful review of the available clinical, pathological and radiological information, and after a detailed discussion with the patient and family regarding goals of care, expected benefits, potential toxicities and alternative treatment strategies. The final treatment decision rests with the patient and the primary treating team.</p>
@@ -606,7 +668,7 @@
       { name: 'infusionDrugs', label: 'Drug infusion sequence (per cycle)', type: 'drugList', required: true },
 
       // ----- Pre-medication preferences -----
-      { type: 'groupHeader', label: 'Pre-medication Preferences (30 min before chemotherapy)' },
+      { type: 'groupHeader', label: 'Pre-medication Preferences (before chemotherapy)' },
       { name: 'premedNK1', label: 'NK1 Antagonist', type: 'select',
         options: [
           { value: 'fosaprepitant', label: 'Inj. Fosaprepitant 150mg IV' },
@@ -637,7 +699,7 @@
         ] },
       { name: 'premedAntiHist', label: 'H1 Antihistamine (HSR prophylaxis)', type: 'select',
         options: [
-          { value: 'pheniramine',     label: 'Inj. Pheniramine Maleate 25mg IV' },
+          { value: 'pheniramine',     label: 'Inj. Pheniramine maleate 22.75mg IV' },
           { value: 'diphenhydramine', label: 'Inj. Diphenhydramine 50mg IV' }
         ] },
 
@@ -763,9 +825,9 @@
 
           ${sectionsBlock('Recommended treatment plan going forward',
             `<p>${esc(d.planAhead)}</p>
-             <p><strong>Frequency of cycles:</strong> ${esc(d.cycleFrequency)}.</p>`)}
+             <p><strong>Frequency of cycles:</strong> ${stop(d.cycleFrequency)}</p>`)}
 
-          ${sectionsBlock('Pre-medications (administer 30 min before chemotherapy)', preTable)}
+          ${sectionsBlock('Pre-medications (before chemotherapy, on the day of each cycle)', preTable)}
 
           ${sectionsBlock('Drug infusion sequence', infTable)}
 
@@ -791,7 +853,7 @@
 
           <h3 class="cc-section">Continuing communication</h3>
           <div class="cc-body">
-            <p>Our team remains available for any clinical clarification at any stage of ${pronoun(d.sex,'poss')} ongoing treatment. The patient and the receiving physician are most welcome to fix up a <strong>video consultation</strong> with us as and when needed — to review scans, discuss treatment modifications, or address any complication. The patient has been advised to keep us informed at major milestones of treatment and to share interim reports for our records.</p>
+            <p>Our team remains available for any clinical clarification at any stage of ${pronoun(d.sex,'poss')} ongoing treatment. The patient and the receiving physician are most welcome to schedule a <strong>video consultation</strong> with us as and when needed — to review scans, discuss treatment modifications, or address any complication. The patient has been advised to keep us informed at major milestones of treatment and to share interim reports for our records.</p>
           </div>
 
           ${d.extraNotes ? sectionsBlock('Additional notes', `<p>${esc(d.extraNotes)}</p>`) : ''}
@@ -836,7 +898,7 @@
     // 5. H1 antihistamine
     if (d.premedAntiHist) {
       const hMap = {
-        pheniramine:     { drug: 'Inj. Pheniramine Maleate', dose: '25 mg' },
+        pheniramine:     { drug: 'Inj. Pheniramine maleate', dose: '22.75 mg' },
         diphenhydramine: { drug: 'Inj. Diphenhydramine',     dose: '50 mg' }
       };
       const r = hMap[d.premedAntiHist];
@@ -905,9 +967,10 @@
     ],
     render(d, doc) {
       const addressee = d.pathLab ? esc(d.pathLab) : 'The Department of Pathology';
-      const purposeLine = d.purpose
-        ? `<p>The slides and blocks are required <strong>${esc(d.purpose).toLowerCase()}</strong>.</p>`
-        : '';
+      const purposeLine = !d.purpose ? ''
+        : /^other/i.test(d.purpose)
+          ? `<p>The slides and blocks are required for the purpose stated in the additional notes below.</p>`
+          : `<p>The slides and blocks are required <strong>${esc(lcFirst(d.purpose))}</strong>.</p>`;
       return `
         ${heading('Request for Release of Slides and Blocks')}
         ${meta(d.letterDate)}
@@ -967,8 +1030,8 @@
       sampleType: 'Blood / ctDNA (liquid biopsy)'
     },
     {
-      value: 'Indigene Liquid',
-      label: 'Indigene Liquid',
+      value: 'Indiegene Liquid',
+      label: 'Indiegene Liquid',
       category: 'Liquid',
       measures: 'ctDNA genomic insights',
       sampleType: 'Blood / ctDNA (liquid biopsy)'
@@ -981,8 +1044,8 @@
       sampleType: 'Tissue + blood'
     },
     {
-      value: 'Indigene SoLiQ™',
-      label: 'Indigene SoLiQ™',
+      value: 'Indiegene SoLiQ™',
+      label: 'Indiegene SoLiQ™',
       category: 'SoLiQ',
       measures: 'Dual-source multidimensional genomic insights',
       sampleType: 'Tissue + blood'
@@ -1049,7 +1112,7 @@
         ? FOURBASECARE_TEST_OPTIONS.find(x => x.value === test)
         : null;
       const testDetails = fourBaseCareTest
-        ? `<p><strong>Test details:</strong> ${esc(fourBaseCareTest.category)}; ${esc(fourBaseCareTest.measures)}; sample type: ${esc(fourBaseCareTest.sampleType)}.</p>`
+        ? `<p><strong>Test details:</strong> ${esc(fourBaseCareTest.category)}; ${esc(fourBaseCareTest.measures)}; sample type: ${stop(fourBaseCareTest.sampleType)}</p>`
         : '';
       const isGermline = /germline|brca|hereditary/i.test(test);
       const indicationLine = isGermline
@@ -1066,7 +1129,7 @@
           ${testDetails}
           <p>${indicationLine}</p>
           ${d.extraNotes ? `<p><strong>Additional clinical context:</strong> ${esc(d.extraNotes)}</p>` : ''}
-          <p>The patient and / or family have been counselled regarding the rationale, scope and limitations of the test, the expected turnaround time and applicable charges, and have provided informed consent for sample processing and reporting. Kindly share the final report with our department at the earliest convenience.</p>
+          <p>The patient and / or family have been counselled regarding the rationale, scope and limitations of the test, the expected turnaround time and applicable charges, and have provided informed consent for sample processing and reporting. Kindly share the final report with our department at your earliest convenience.</p>
           <p>Thank you for your cooperation.</p>
         </div>
         ${signoff(doc)}`;
@@ -1135,19 +1198,19 @@
         ${patientBlock(d)}
         <div class="body">
           <p>This is to document that <strong>${esc(d.attenderName)}</strong> (${esc(d.relationship)} of the patient) was counselled in detail on <strong>${formatDate(d.counsellingDate)}</strong> regarding the patient’s current oncological condition, treatment status and guarded prognosis.</p>
-          <p><strong>Current clinical status:</strong> ${esc(d.clinicalStatus)}.</p>
-          <p>The attender was explained that the patient has <strong>${esc(d.diagnosis)}</strong> and that the overall prognosis is guarded / poor in view of the following clinical factors: ${esc(d.prognosisConcerns)}.</p>
-          <p>It was clearly explained that the clinical condition may worsen despite appropriate treatment and monitoring. The possible risks discussed included ${esc(risks)}.</p>
+          <p><strong>Current clinical status:</strong> ${stop(d.clinicalStatus)}</p>
+          <p>It was explained to the attender that the patient has <strong>${esc(d.diagnosis)}</strong> and that the overall prognosis is guarded / poor in view of the following clinical factors: ${stop(d.prognosisConcerns)}</p>
+          <p>It was clearly explained that the clinical condition may worsen despite appropriate treatment and monitoring. The possible risks discussed included ${stop(risks)}</p>
           <p>The family was informed that further anticancer treatment, if any, would depend on the patient’s performance status, organ function, infection control, blood counts, treatment tolerance and overall clinical stability. It was also explained that in the event of significant deterioration, the focus of care may need to shift towards symptom relief, comfort, prevention of suffering and best supportive care.</p>
-          <p><strong>Current treatment intent / approach:</strong> ${esc(d.treatmentIntent)}.</p>
-          ${d.recommendedTreatment ? `<p><strong>Treatment / intervention advised:</strong> ${esc(d.recommendedTreatment)}.</p>` : ''}
-          <p><strong>Attender / family decision after counselling:</strong> ${esc(d.attenderDecision)}.</p>
+          <p><strong>Current treatment intent / approach:</strong> ${stop(d.treatmentIntent)}</p>
+          ${d.recommendedTreatment ? `<p><strong>Treatment / intervention advised:</strong> ${stop(d.recommendedTreatment)}</p>` : ''}
+          <p><strong>Attender / family decision after counselling:</strong> ${stop(d.attenderDecision)}</p>
           ${/declined|deferred|requested discharge|declined icu|comfort-focused/i.test(d.attenderDecision || '') ? `
             <p>It was specifically explained that refusal, deferral or limitation of the advised treatment / escalation may result in worsening symptoms, irreversible clinical deterioration, avoidable complications and death. The attender / family member stated that they understood these risks.</p>
           ` : ''}
-          ${d.refusalDetails ? `<p><strong>Reason / details documented:</strong> ${esc(d.refusalDetails)}.</p>` : ''}
-          <p><strong>Plan explained:</strong> ${esc(d.carePlan)}.</p>
-          <p>The attender was encouraged to ask questions, and the above information was explained in understandable language. The seriousness of the condition, possibility of sudden deterioration, and need for urgent medical attention in case of worsening symptoms were reiterated.</p>
+          ${d.refusalDetails ? `<p><strong>Reason / details documented:</strong> ${stop(d.refusalDetails)}</p>` : ''}
+          <p><strong>Plan explained:</strong> ${stop(d.carePlan)}</p>
+          <p>The attender was encouraged to ask questions, and the above information was explained in a language the attender understood. The seriousness of the condition, possibility of sudden deterioration, and need for urgent medical attention in case of worsening symptoms were reiterated.</p>
           ${d.extraNotes ? `<p><strong>Additional notes:</strong> ${esc(d.extraNotes)}</p>` : ''}
           <p>This letter is issued as a record of the counselling discussion held with the patient’s attender / family member and should be interpreted along with the treating team’s ongoing clinical notes and treatment orders.</p>
         </div>
@@ -1167,6 +1230,7 @@
   };
 
   // ============================================================
+  window.CUSTOM_DOSE = CUSTOM_DOSE;
   window.GENOMIC_TEST_OPTIONS = {
     default: DEFAULT_GENOMIC_TEST_OPTIONS,
     fourbasecare: FOURBASECARE_TEST_OPTIONS

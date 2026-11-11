@@ -335,7 +335,47 @@ body.generator.is-ready .generator-shell {
 /* ---------- Preview / letter page ---------- */
 .preview-panel {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Formatting toolbar above the letter */
+.format-bar {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  width: 210mm;
+  max-width: 100%;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+}
+.format-bar button {
+  min-width: 34px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.format-bar button:hover { border-color: var(--accent); color: var(--accent); }
+.format-bar .hl-swatch { background: #fff176; padding: 1px 4px; border-radius: 3px; color: var(--ink); }
+.format-sep { width: 1px; height: 22px; background: var(--line); margin: 0 2px; }
+.format-tip { font-size: 12px; color: var(--muted); margin-left: auto; }
+@media (max-width: 700px) {
+  .format-bar { width: 100%; }
+  .format-tip { display: none; }
 }
 .letter-page {
   background: #fff;
@@ -997,6 +1037,12 @@ body.generator.is-ready .generator-shell {
 @media print {
   @page { size: A4; margin: 0; }
   body { background: #fff; }
+  .format-bar { display: none !important; }
+  /* Print highlighted text in colour */
+  .letter-page [style*="background-color"] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   .no-print, .site-header, .site-footer, .form-panel, .actions { display: none !important; }
   .generator-shell { display: block; padding: 0; }
   .preview-panel { display: block; }
@@ -1057,6 +1103,12 @@ body.generator.is-ready .generator-shell {
   .letter-page h1.rx-title              { color: #000 !important; text-decoration: underline !important; }
   .letter-page .rx-divider              { border-top: 1px solid #000 !important; }
   .letter-page .rx-signoff .rx-sig-line { border-top: 1px solid #000 !important; }
+  /* Highlights print as light grey on black & white printers */
+  .letter-page [style*="background-color: rgb(255, 241, 118)"] {
+    background: #d9d9d9 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
   /* Convert the letter logo to greyscale */
   .letter-page .letter-logo             { filter: grayscale(100%) !important; }
 }

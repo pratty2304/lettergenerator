@@ -69,6 +69,43 @@
   previewEl.addEventListener('beforeinput', handleEditableRuleInput);
   previewEl.addEventListener('keydown', handleEditableRuleKeys);
   previewEl.addEventListener('input', markPreviewEdited);
+  hookFormatBar();
+
+  // ---------- Formatting toolbar (bold / italic / underline / highlight) ----------
+  function hookFormatBar() {
+    const bar = document.querySelector('.format-bar');
+    if (!bar) return;
+    // Keep the text selection in the letter when a toolbar button is pressed
+    bar.addEventListener('mousedown', e => { if (e.target.closest('button')) e.preventDefault(); });
+    bar.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-cmd]');
+      if (btn) applyFormat(btn.dataset.cmd);
+    });
+    previewEl.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        applyFormat('highlight');
+      }
+    });
+  }
+
+  function applyFormat(cmd) {
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || !previewEl.contains(sel.anchorNode)) {
+      alert('Select some text in the letter first.');
+      return;
+    }
+    document.execCommand('styleWithCSS', false, cmd === 'highlight' || cmd === 'unhighlight');
+    if (cmd === 'highlight') document.execCommand('hiliteColor', false, '#fff176');
+    else if (cmd === 'unhighlight') document.execCommand('hiliteColor', false, 'transparent');
+    else if (cmd === 'removeFormat') {
+      document.execCommand('removeFormat');
+      document.execCommand('styleWithCSS', false, true);
+      document.execCommand('hiliteColor', false, 'transparent');
+    } else document.execCommand(cmd);
+    document.execCommand('styleWithCSS', false, false);
+    markPreviewEdited();
+  }
 
   function markPreviewEdited() {
     previewHasManualEdits = true;
@@ -236,6 +273,22 @@
       refreshDrugFields();
       updateLivePreview();
     });
+    const doseSel = formEl.querySelector('select[name="dose"]');
+    if (doseSel) doseSel.addEventListener('change', () => {
+      refreshDoseExtras();
+      updateLivePreview();
+    });
+  }
+
+  // Show "type dose", "body weight" and "number of cycles" only when they apply
+  function refreshDoseExtras() {
+    const drugSel = formEl.querySelector('select[name="drugId"]');
+    const doseSel = formEl.querySelector('select[name="dose"]');
+    if (!drugSel || !doseSel) return;
+    const isCustom = doseSel.value === window.CUSTOM_DOSE;
+    toggleField('customDose', isCustom);
+    toggleField('weightKg', isCustom || /mg\s*\/\s*kg/i.test(doseSel.value));
+    toggleField('cyclesPlanned', drugSel.value === 'pembrolizumab');
   }
 
   function refreshDrugFields() {
@@ -247,6 +300,7 @@
     if (!drug) {
       if (brandSel) brandSel.innerHTML = '<option value="">— Pick drug first —</option>';
       if (doseSel)  doseSel.innerHTML  = '<option value="">— Pick drug first —</option>';
+      refreshDoseExtras();
       return;
     }
     if (brandSel) {
@@ -254,8 +308,10 @@
     }
     if (doseSel) {
       doseSel.innerHTML = drug.standardDoses.map(d =>
-        `<option ${d === drug.defaultDose ? 'selected' : ''}>${d}</option>`).join('');
+        `<option ${d === drug.defaultDose ? 'selected' : ''}>${d}</option>`).join('')
+        + `<option value="${window.CUSTOM_DOSE}">Other — type dose below</option>`;
     }
+    refreshDoseExtras();
   }
 
   function hookGenomicLabChange() {
@@ -609,7 +665,7 @@
 
     (tmpl.fields || []).forEach(field => {
       if (field.type === 'drugList') return;
-      if (['drugId', 'brand', 'dose', 'geneLab', 'geneLabOther', 'testType'].includes(field.name)) return;
+      if (['drugId', 'brand', 'dose', 'customDose', 'weightKg', 'cyclesPlanned', 'geneLab', 'geneLabOther', 'testType'].includes(field.name)) return;
       setFormValue(field.name, data[field.name]);
       if (field.type === 'selectWithDays') setFormValue(`${field.name}_days`, data[`${field.name}_days`]);
     });
@@ -618,6 +674,10 @@
     refreshDrugFields();
     setFormValue('brand', data.brand);
     setFormValue('dose', data.dose);
+    refreshDoseExtras();
+    setFormValue('customDose', data.customDose);
+    setFormValue('weightKg', data.weightKg);
+    setFormValue('cyclesPlanned', data.cyclesPlanned);
 
     setFormValue('geneLab', data.geneLab);
     refreshGenomicFields();
@@ -983,6 +1043,11 @@
     });
     if (missing.length) {
       alert('Please complete: ' + missing.map(f => f.label).join(', '));
+      return false;
+    }
+    const problem = typeof tmpl.validate === 'function' ? tmpl.validate(data) : '';
+    if (problem) {
+      alert(problem);
       return false;
     }
     return true;

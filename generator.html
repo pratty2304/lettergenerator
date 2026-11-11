@@ -45,6 +45,17 @@
     </aside>
 
     <section class="preview-panel">
+      <div class="format-bar no-print" role="toolbar" aria-label="Text formatting">
+        <button type="button" data-cmd="bold" title="Bold (Ctrl/⌘ + B)"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="Italic (Ctrl/⌘ + I)"><i>I</i></button>
+        <button type="button" data-cmd="underline" title="Underline (Ctrl/⌘ + U)"><u>U</u></button>
+        <span class="format-sep"></span>
+        <button type="button" data-cmd="highlight" title="Highlight (Ctrl/⌘ + Shift + H)"><span class="hl-swatch">Highlight</span></button>
+        <button type="button" data-cmd="unhighlight" title="Remove highlight">Remove highlight</button>
+        <span class="format-sep"></span>
+        <button type="button" data-cmd="removeFormat" title="Clear bold / italic / underline / highlight from selected text">Clear formatting</button>
+        <span class="format-tip">Select text in the letter, then click.</span>
+      </div>
       <article id="letterPreview" class="letter-page" contenteditable="true">
         <div class="empty-state">
           <p>Preparing letter draft...</p>
